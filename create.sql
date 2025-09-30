@@ -85,6 +85,23 @@ CREATE TABLE Items.LuggageItem (
     luggage_id INTEGER NOT NULL REFERENCES Items.Luggage(id) ON DELETE CASCADE 
 );
 
+CREATE SCHEMA Criminal;
+
+CREATE TABLE Criminal.Record(
+    id SERIAL PRIMARY KEY ,
+    description TEXT NOT NULL
+);
+
+CREATE TABLE Criminal.Case(
+    crimeId INT NOT NULL REFERENCES Criminal.Record(id) ON DELETE CASCADE,
+    passportId INT NOT NULL REFERENCES identity.passport(id) ON DELETE CASCADE 
+);
+
 ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
 ALTER TABLE Items.LuggageItem ADD COLUMN itemName TEXT NOT NULL;
 ALTER TABLE papers.workPermission ADD COLUMN fullName VARCHAR(100) NOT NULL;
+
+ALTER TABLE Items.LuggageItem ADD COLUMN weight DECIMAL(9, 4) DEFAULT 0.0;
+ALTER TABLE Items.LuggageItem DROP COLUMN weight;
+ALTER TABLE Items.LuggageItem ALTER COLUMN itemName TYPE VARCHAR(255);
+ALTER TABLE Items.LuggageItem ADD CONSTRAINT length_check CHECK (length(itemname) > 0);
