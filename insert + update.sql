@@ -12,6 +12,13 @@ INSERT INTO identity.citizenEntryPermission (fromId, toId) VALUES
 (4, 1),
 (4, 2);
 
+INSERT INTO papers.vaccine (name) VALUES
+('БЦЖ'),
+('вакцина Солка'),
+('вакцина против гепатита В'),
+('вакцина против тифа'),
+('пневмококовая вакцина');
+
 INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
