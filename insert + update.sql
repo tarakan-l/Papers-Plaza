@@ -56,15 +56,27 @@ INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 
 INSERT INTO Criminal.Record(description) VALUES
-('Украл сладкий рулет');
+('Украл сладкий рулет'),
+('Убил человека'),
+('Побег из тюрьмы'),
+('Сделал пост в сети');
 
+INSERT INTO Items.Luggage DEFAULT VALUES;
+INSERT INTO Items.Luggage DEFAULT VALUES;
+INSERT INTO Items.Luggage DEFAULT VALUES;
 INSERT INTO Items.Luggage DEFAULT VALUES;
 
 INSERT INTO Items.LuggageItem(itemName, luggage_id) VALUES 
-('Пистолет', 1);
+('Пистолет', 1),
+('Абобус', 1),
+('Laptop', 2);
+
 
 INSERT INTO Criminal.Case(crimeId, passportId) VALUES 
-(1, 1);
+(1, 1),
+(1, 2),
+(3, 2),
+(4, 3);
 
 
 UPDATE Items.LuggageItem
