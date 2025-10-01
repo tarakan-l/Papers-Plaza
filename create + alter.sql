@@ -27,44 +27,46 @@ CREATE TABLE identity.passport (
 
 CREATE SCHEMA papers;
 
-CREATE SEQUENCE papers.documentIdSeq; 
-
-CREATE TABLE papers.document (
-    id INT PRIMARY KEY DEFAULT nextval('papers.documentIdSeq'),
-    issueDate DATE NOT NULL,
-    validUntil DATE NOT NULL,
-  CHECK (issueDate < validUntil)
-);
-
 CREATE TABLE papers.vaccine (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE papers.workPermission (
-    -- fullName VARCHAR(100) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    issueDate DATE NOT NULL,
+    validUntil DATE NOT NULL,
+    fullName VARCHAR(100) NOT NULL,
   countryOfIssue INT NOT NULL REFERENCES identity.country(id),
     activityType VARCHAR(100) NOT NULL,
-  PRIMARY KEY (id)
-) INHERITS (papers.document);
+  CHECK (issueDate < validUntil)
+);
 
 CREATE TABLE papers.entryPermission (
+    id SERIAL PRIMARY KEY,
+    issueDate DATE NOT NULL,
+    validUntil DATE NOT NULL,
     countryOfIssue INT NOT NULL REFERENCES identity.country(id),
     fullName VARCHAR(100) NOT NULL,
-  PRIMARY KEY (id)
-) INHERITS (papers.document);
+  CHECK (issueDate < validUntil)
+);
 
 CREATE TABLE papers.vaccinationCertificate (
+    id SERIAL PRIMARY KEY,
+    issueDate DATE NOT NULL,
+    validUntil DATE NOT NULL,
     issueByWhom VARCHAR(100) NOT NULL,
-  -- vaccineId INT REFERENCES papers.vaccine(id),
-  PRIMARY KEY (id)
-) INHERITS (papers.document);
+  CHECK (issueDate < validUntil)
+);
 
 CREATE TABLE papers.diplomatCertificate (
+    id SERIAL PRIMARY KEY,
+    issueDate DATE NOT NULL,
+    validUntil DATE NOT NULL,
     fullName VARCHAR(100) NOT NULL,
     countryOfIssue INT NOT NULL REFERENCES identity.country(id),
-  PRIMARY KEY (id)
-) INHERITS (papers.document);
+  CHECK (issueDate < validUntil)
+);
 
 CREATE TABLE papers.diseaseVaccine 
 (
