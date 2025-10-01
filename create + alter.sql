@@ -100,9 +100,6 @@ CREATE TABLE Criminal.Case(
 );
 
 ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
-ALTER TABLE Items.LuggageItem ADD COLUMN itemName TEXT NOT NULL;
-ALTER TABLE papers.workPermission ADD COLUMN fullName VARCHAR(100) NOT NULL;
-
 ALTER TABLE Items.LuggageItem ADD COLUMN weight DECIMAL(9, 4) DEFAULT 0.0;
 ALTER TABLE Items.LuggageItem DROP COLUMN weight;
 ALTER TABLE Items.LuggageItem ALTER COLUMN itemName TYPE VARCHAR(255);
