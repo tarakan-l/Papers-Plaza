@@ -84,14 +84,14 @@ CREATE TABLE Items.Luggage(
 
 CREATE TABLE Items.LuggageItem (
     id SERIAL PRIMARY KEY,
-    -- itemName TEXT NOT NULL,
+    itemName TEXT NOT NULL,
     luggage_id INTEGER NOT NULL REFERENCES Items.Luggage(id)
 );
 
 CREATE SCHEMA Criminal;
 
 CREATE TABLE Criminal.Record(
-    id SERIAL PRIMARY KEY ,
+    id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
 );
 
