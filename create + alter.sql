@@ -90,15 +90,15 @@ CREATE TABLE Items.LuggageItem (
 
 CREATE SCHEMA Criminal;
 
-CREATE TABLE Criminal.Record(
+CREATE TABLE Criminal.Case(
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
 );
 
-CREATE TABLE Criminal.Case(
-    crimeId INT NOT NULL REFERENCES Criminal.Record(id),
-    passportId INT NOT NULL REFERENCES identity.passport(id),
-    PRIMARY KEY (crimeId, passportId)
+CREATE TABLE Criminal.Record(
+    crimeId INT NOT NULL REFERENCES Criminal.Case(id),
+    biometryId INT NOT NULL REFERENCES identity.biometry(id),
+    PRIMARY KEY (crimeId, biometryId)
 );
 
 ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
