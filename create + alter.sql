@@ -8,7 +8,8 @@ CREATE TABLE identity.country (
 CREATE TABLE identity.citizenEntryPermission (
   fromId INT REFERENCES identity.country(id),
   toId INT REFERENCES identity.country(id),
-  CHECK (fromId <> toId)
+  CHECK (fromId <> toId),
+  PRIMARY KEY (fromId, toId)
 );
 
 CREATE TABLE identity.biometry (
@@ -84,7 +85,7 @@ CREATE TABLE Items.Luggage(
 CREATE TABLE Items.LuggageItem (
     id SERIAL PRIMARY KEY,
     -- itemName TEXT NOT NULL,
-    luggage_id INTEGER NOT NULL REFERENCES Items.Luggage(id) ON DELETE CASCADE 
+    luggage_id INTEGER NOT NULL REFERENCES Items.Luggage(id)
 );
 
 CREATE SCHEMA Criminal;
@@ -95,8 +96,9 @@ CREATE TABLE Criminal.Record(
 );
 
 CREATE TABLE Criminal.Case(
-    crimeId INT NOT NULL REFERENCES Criminal.Record(id) ON DELETE CASCADE,
-    passportId INT NOT NULL REFERENCES identity.passport(id) ON DELETE CASCADE 
+    crimeId INT NOT NULL REFERENCES Criminal.Record(id),
+    passportId INT NOT NULL REFERENCES identity.passport(id),
+    PRIMARY KEY (crimeId, passportId)
 );
 
 ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
