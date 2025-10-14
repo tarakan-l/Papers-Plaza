@@ -6,8 +6,8 @@ CREATE TABLE identity.country (
 );
 
 CREATE TABLE identity.citizenEntryPermission (
-    fromId INT REFERENCES identity.country (id),
-    toId INT REFERENCES identity.country (id),
+    fromId INT NOT NULL REFERENCES identity.country (id),
+    toId INT NOT NULL REFERENCES identity.country (id),
     CHECK (fromId <> toId),
     PRIMARY KEY (fromId, toId)
 );
@@ -20,7 +20,7 @@ CREATE TABLE identity.passport (
     issueDate DATE NOT NULL,
     validUntil DATE NOT NULL,
     biometry INT REFERENCES identity.biometry (id),
-    country INT REFERENCES identity.country (id),
+    country INT NOT NULL REFERENCES identity.country (id),
     CHECK (issueDate < validUntil)
 );
 

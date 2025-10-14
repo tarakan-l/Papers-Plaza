@@ -15,7 +15,8 @@ INSERT INTO identity.citizenEntryPermission (fromId, toId) VALUES
 INSERT INTO identity.passport (fullName, issueDate, validUntil, biometry, country)
 VALUES
 ('Иван Иваныч', '2025-01-01', '2026-01-01', 1, 1),
-('Джеки Чан', '2020-01-01', '2030-01-01', 2, 4);
+('Джеки Чан', '2020-01-01', '2030-01-01', 2, 4),
+('Гаррье Дюбуа', '2020-01-01', '2021-01-01', 3, 1);
 
 INSERT INTO papers.vaccine (name) VALUES 
 ('БЦЖ'), 
@@ -51,7 +52,8 @@ INSERT INTO papers.vaccinationCertificate
 INSERT INTO papers.diplomatCertificate (issueDate, validUntil, fullName, countryOfIssue) VALUES 
 ('2025-01-01', '2027-01-01', 'Sergey Petrov', 3), 
 ('2024-06-01', '2026-06-01', 'Alice Brown', 4), 
-('2025-02-20', '2028-02-20', 'Hiroshi Yamamoto', 1); 
+('2025-02-20', '2028-02-20', 'Hiroshi Yamamoto', 1),
+('2022-05-01', '2026-05-01', 'Гаррье Дюбуа', 1);
 
 INSERT INTO papers.diseaseVaccine (vaccineId, vaccinationCertificateId) VALUES 
 (1, 1), -- БЦЖ в сертификате 1 
