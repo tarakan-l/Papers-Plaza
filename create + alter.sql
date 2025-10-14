@@ -80,17 +80,27 @@ CREATE SCHEMA Items;
 
 CREATE TABLE Items.Luggage (id SERIAL PRIMARY KEY);
 
+CREATE TABLE Items.LuggageItemType (
+    id SERIAL PRIMARY KEY,
+    itemName TEXT NOT NULL
+);
+
 CREATE TABLE Items.LuggageItem (
     id SERIAL PRIMARY KEY,
-    itemName TEXT NOT NULL,
+    itemType_Id INTEGER NOT NULL REFERENCES Items.LuggageItemType (id),
     luggage_id INTEGER NOT NULL REFERENCES Items.Luggage (id)
 );
 
 CREATE SCHEMA Criminal;
 
-CREATE TABLE Criminal.Case (
+CREATE TABLE Criminal.CaseType (
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
+);
+
+CREATE TABLE Criminal.Case (
+    id SERIAL PRIMARY KEY,
+    caseType_id INTEGER NOT NULL REFERENCES Criminal.CaseType (id)
 );
 
 CREATE TABLE Criminal.Record (

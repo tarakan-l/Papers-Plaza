@@ -55,21 +55,32 @@ INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 
-INSERT INTO Criminal.Case(description) VALUES
+INSERT INTO Criminal.CaseType(description) VALUES
 ('Украл сладкий рулет'),
 ('Убил человека'),
 ('Побег из тюрьмы'),
 ('Сделал пост в сети');
 
+INSERT INTO Criminal.Case(casetype_id) VALUES
+(1),
+(2),
+(3),
+(4);
+
 INSERT INTO Items.Luggage DEFAULT VALUES;
 INSERT INTO Items.Luggage DEFAULT VALUES;
 INSERT INTO Items.Luggage DEFAULT VALUES;
 INSERT INTO Items.Luggage DEFAULT VALUES;
 
-INSERT INTO Items.LuggageItem(itemName, luggage_id) VALUES 
-('Пистолет', 1),
-('Абобус', 1),
-('Laptop', 2);
+INSERT INTO Items.LuggageItemType(itemName) VALUES 
+('Пистолет'),
+('Абобус'),
+('Laptop');
+
+INSERT INTO Items.LuggageItem(itemtype_id, luggage_id) VALUES 
+(1, 1),
+(2, 1),
+(3, 2);
 
 
 INSERT INTO Criminal.Record(crimeId, biometryId) VALUES 
@@ -79,11 +90,11 @@ INSERT INTO Criminal.Record(crimeId, biometryId) VALUES
 (4, 3);
 
 
-UPDATE Items.LuggageItem
+UPDATE Items.LuggageItemType
 SET itemName = 'Пистолет ПМ'
 WHERE id = 1;
 
-UPDATE Criminal.Case
+UPDATE Criminal.CaseType
 SET description = 'Кража драгоценностей из музея'
 WHERE id = 1;
 
