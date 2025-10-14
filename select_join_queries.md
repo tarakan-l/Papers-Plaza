@@ -9,15 +9,38 @@ SELECT * FROM identity.country;
 
 2. Выборка отдельных столбцов
 
+2.1 Получить названия всех стран
+```sql
+SELECT name FROM identity.country;
+```
+![фото](2_1.png)
+
 
 3. Присвоение новых имен столбцам при формировании выборки
+
+3.1 Получить из списка паспортов все имена приезжих с их страной
+```sql
+SELECT fullname, country as from FROM identity.passport;
+```
+![фото](3_1.png)
 
 
 4. Выборка данных с созданием вычисляемого столбца
 
+4.1 Получить из списка паспортов все имена приезжих с данными о валидности паспорта
+```sql
+SELECT fullName, validUntil > CURRENT_DATE AS is_valid FROM identity.passport;
+```
+![фото](4_1.png)
+
 
 5. Выборка данных, вычисляемые столбцы, математические функции
 
+5.1 Получить из списка паспортов все имена приезжих с данными о валидности паспорта
+```sql
+SELECT fullName, validUntil > CURRENT_DATE AS is_valid FROM identity.passport;
+```
+![фото](4_1.png)
 
 6. Выборка данных, вычисляемые столбцы, логические функции
 
