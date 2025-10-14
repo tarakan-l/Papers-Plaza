@@ -1,36 +1,34 @@
 CREATE SCHEMA identity;
 
 CREATE TABLE identity.country (
-  id SERIAL PRIMARY KEY
-  -- name VARCHAR(20) NOT NULL
+    id SERIAL PRIMARY KEY
+    -- name VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE identity.citizenEntryPermission (
-  fromId INT REFERENCES identity.country(id),
-  toId INT REFERENCES identity.country(id),
-  CHECK (fromId <> toId),
-  PRIMARY KEY (fromId, toId)
+    fromId INT REFERENCES identity.country (id),
+    toId INT REFERENCES identity.country (id),
+    CHECK (fromId <> toId),
+    PRIMARY KEY (fromId, toId)
 );
 
-CREATE TABLE identity.biometry (
-  id SERIAL PRIMARY KEY
-);
+CREATE TABLE identity.biometry (id SERIAL PRIMARY KEY);
 
 CREATE TABLE identity.passport (
-  id SERIAL PRIMARY KEY,
-  fullName VARCHAR(100) NOT NULL,
-  issueDate DATE NOT NULL,
-  validUntil DATE NOT NULL,
-  biometry INT REFERENCES identity.biometry(id),
-  country INT REFERENCES identity.country(id),
-  CHECK (issueDate < validUntil)
+    id SERIAL PRIMARY KEY,
+    fullName VARCHAR(100) NOT NULL,
+    issueDate DATE NOT NULL,
+    validUntil DATE NOT NULL,
+    biometry INT REFERENCES identity.biometry (id),
+    country INT REFERENCES identity.country (id),
+    CHECK (issueDate < validUntil)
 );
 
 CREATE SCHEMA papers;
 
 CREATE TABLE papers.vaccine (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE papers.workPermission (
@@ -38,18 +36,18 @@ CREATE TABLE papers.workPermission (
     issueDate DATE NOT NULL,
     validUntil DATE NOT NULL,
     fullName VARCHAR(100) NOT NULL,
-  countryOfIssue INT NOT NULL REFERENCES identity.country(id),
+    countryOfIssue INT NOT NULL REFERENCES identity.country (id),
     activityType VARCHAR(100) NOT NULL,
-  CHECK (issueDate < validUntil)
+    CHECK (issueDate < validUntil)
 );
 
 CREATE TABLE papers.entryPermission (
     id SERIAL PRIMARY KEY,
     issueDate DATE NOT NULL,
     validUntil DATE NOT NULL,
-    countryOfIssue INT NOT NULL REFERENCES identity.country(id),
+    countryOfIssue INT NOT NULL REFERENCES identity.country (id),
     fullName VARCHAR(100) NOT NULL,
-  CHECK (issueDate < validUntil)
+    CHECK (issueDate < validUntil)
 );
 
 CREATE TABLE papers.vaccinationCertificate (
@@ -57,7 +55,7 @@ CREATE TABLE papers.vaccinationCertificate (
     issueDate DATE NOT NULL,
     validUntil DATE NOT NULL,
     issueByWhom VARCHAR(100) NOT NULL,
-  CHECK (issueDate < validUntil)
+    CHECK (issueDate < validUntil)
 );
 
 CREATE TABLE papers.diplomatCertificate (
@@ -65,44 +63,63 @@ CREATE TABLE papers.diplomatCertificate (
     issueDate DATE NOT NULL,
     validUntil DATE NOT NULL,
     fullName VARCHAR(100) NOT NULL,
-    countryOfIssue INT NOT NULL REFERENCES identity.country(id),
-  CHECK (issueDate < validUntil)
+    countryOfIssue INT NOT NULL REFERENCES identity.country (id),
+    CHECK (issueDate < validUntil)
 );
 
-CREATE TABLE papers.diseaseVaccine 
-(
-  vaccineId INT REFERENCES papers.vaccine(id),
-  vaccinationCertificateId INT REFERENCES papers.vaccinationCertificate(id),
-  PRIMARY KEY (vaccineId, vaccinationCertificateId)
+CREATE TABLE papers.diseaseVaccine (
+    vaccineId INT REFERENCES papers.vaccine (id),
+    vaccinationCertificateId INT REFERENCES papers.vaccinationCertificate (id),
+    PRIMARY KEY (
+        vaccineId,
+        vaccinationCertificateId
+    )
 );
 
 CREATE SCHEMA Items;
 
-CREATE TABLE Items.Luggage(
-    id SERIAL PRIMARY KEY
-);
+CREATE TABLE Items.Luggage (id SERIAL PRIMARY KEY);
 
 CREATE TABLE Items.LuggageItem (
     id SERIAL PRIMARY KEY,
     itemName TEXT NOT NULL,
-    luggage_id INTEGER NOT NULL REFERENCES Items.Luggage(id)
+    luggage_id INTEGER NOT NULL REFERENCES Items.Luggage (id)
 );
 
 CREATE SCHEMA Criminal;
 
-CREATE TABLE Criminal.Case(
+CREATE TABLE Criminal.Case (
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
 );
 
-CREATE TABLE Criminal.Record(
-    crimeId INT NOT NULL REFERENCES Criminal.Case(id),
-    biometryId INT NOT NULL REFERENCES identity.biometry(id),
+CREATE TABLE Criminal.Record (
+    crimeId INT NOT NULL REFERENCES Criminal.Case (id),
+    biometryId INT NOT NULL REFERENCES identity.biometry (id),
     PRIMARY KEY (crimeId, biometryId)
 );
 
+CREATE SCHEMA People;
+
+CREATE TABLE People.Entrant (
+    passportId INT REFERENCES identity.passport (id) NOT NULL,
+    workPermissionId INT REFERENCES papers.workPermission (id),
+    entryPermissionId INT REFERENCES papers.entryPermission (id),
+    luggageId INT REFERENCES Items.Luggage (id),
+    vaccinationCertificateId INT REFERENCES papers.vaccinationCertificate (id),
+    diplomatCertificateId INT REFERENCES papers.diplomatCertificate (id),
+    PRIMARY KEY(passportId)
+);
+
 ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
-ALTER TABLE Items.LuggageItem ADD COLUMN weight DECIMAL(9, 4) DEFAULT 0.0;
+
+ALTER TABLE Items.LuggageItem
+ADD COLUMN weight DECIMAL(9, 4) DEFAULT 0.0;
+
 ALTER TABLE Items.LuggageItem DROP COLUMN weight;
-ALTER TABLE Items.LuggageItem ALTER COLUMN itemName TYPE VARCHAR(255);
-ALTER TABLE Items.LuggageItem ADD CONSTRAINT length_check CHECK (length(itemname) > 0);
+
+ALTER TABLE Items.LuggageItem
+ALTER COLUMN itemName TYPE VARCHAR(255);
+
+ALTER TABLE Items.LuggageItem
+ADD CONSTRAINT length_check CHECK (length(itemname) > 0);
