@@ -12,6 +12,11 @@ INSERT INTO identity.citizenEntryPermission (fromId, toId) VALUES
 (4, 1),
 (4, 2);
 
+INSERT INTO identity.passport (fullName, issueDate, validUntil, biometry, country)
+VALUES
+('Иван Иваныч', '2025-01-01', '2026-01-01', 1, 1),
+('Джеки Чан', '2020-01-01', '2030-01-01', 2, 4);
+
 INSERT INTO papers.vaccine (name) VALUES 
 ('БЦЖ'), 
 ('вакцина Солка'), 
@@ -20,10 +25,16 @@ INSERT INTO papers.vaccine (name) VALUES
 ('пневмококовая вакцина');
 
 INSERT INTO papers.workPermission 
-(issueDate, validUntil, fullName, countryOfIssue, activityType) VALUES 
-('2025-01-01', '2026-01-01', 'Ivan Ivanov', 3, 'IT Specialist'), 
-('2024-05-15', '2025-05-15', 'John Smith', 1, 'Engineer'), 
-('2025-03-10', '2026-03-10', 'Pierre Dubois', 2, 'Doctor'); 
+(issueDate, validUntil, fullName, countryOfIssue, activityid) VALUES 
+('2025-01-01', '2026-01-01', 'Ivan Ivanov', 3, 1), 
+('2024-05-15', '2025-05-15', 'John Smith', 1, 2), 
+('2025-03-10', '2026-03-10', 'Pierre Dubois', 2, 3); 
+
+INSERT INTO papers.activity
+(description) VALUES
+('IT Specialist'),
+('Engineer'),
+('Doctor');
 
 INSERT INTO papers.entryPermission 
 (issueDate, validUntil, countryOfIssue, fullName) VALUES 

@@ -37,8 +37,13 @@ CREATE TABLE papers.workPermission (
     validUntil DATE NOT NULL,
     fullName VARCHAR(100) NOT NULL,
     countryOfIssue INT NOT NULL REFERENCES identity.country (id),
-    activityType VARCHAR(100) NOT NULL,
+    activityId INT NOT NULL REFERENCES papers.activity (id),
     CHECK (issueDate < validUntil)
+);
+
+CREATE TABLE papers.activity (
+    id SERIAL PRIMARY KEY,
+    description VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE papers.entryPermission (
