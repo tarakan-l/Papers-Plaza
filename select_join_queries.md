@@ -4,7 +4,7 @@
 ```sql
 SELECT * FROM identity.country;
 ```
-![фото](1_1.png)
+![фото](select_join_screenshots/1_1.png)
 
 
 2. Выборка отдельных столбцов
