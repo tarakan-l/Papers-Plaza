@@ -49,7 +49,6 @@ INSERT INTO papers.diseaseVaccine (vaccineId, vaccinationCertificateId) VALUES
 (1, 2), -- БЦЖ тоже в сертификате 2 
 (4, 3); -- вакцина против тифа в сертификате 3
 
-
 INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
