@@ -236,6 +236,15 @@ LIMIT 1;
 ```
 ![фото](select_join_screenshots/14_1.png)
 
+14.2 Получить две случайные строки с предметами
+```sql
+select itemName
+from items.luggageitemtype
+order by random()
+limit 2;
+```
+<img width="173" height="79" alt="image" src="https://github.com/user-attachments/assets/57dd364b-e18e-44c6-8ae0-876b8b3a1048" />
+
 15. Соединение INNER JOIN
 
 15.1 Получить ФИО пользователей с паспортами вместе с названиями стран, откуда они
@@ -245,6 +254,13 @@ FROM identity.passport p
 INNER JOIN identity.country c ON p.country = c.id;
 ```
 ![фото](select_join_screenshots/15_1.png)
+
+15.2 Соединить две таблицы с криминальными случаями и преступлениями
+```sql
+select "case".id, description
+from criminal."case" join criminal.casetype c on "case".casetype_id = c.id;
+```
+<img width="445" height="139" alt="image" src="https://github.com/user-attachments/assets/2d57c6ee-687d-4d4f-bfc1-50fea31a85fc" />
 
 16. Внешнее соединение LEFT OUTER JOIN
 
@@ -256,6 +272,16 @@ LEFT JOIN papers.diplomatCertificate d ON p.fullName = d.fullName;
 ```
 ![фото](select_join_screenshots/16_1.png)
 
+16.2 Получить имена преступников и их преступления
+```sql
+select fullname, description
+from identity.passport left join identity.biometry b on b.id = passport.biometry
+left join criminal.record r on b.id = r.biometryid
+left join criminal."case" c on r.crimeid = c.id
+left join criminal.casetype c2 on c.casetype_id = c2.id;
+```
+<img width="474" height="131" alt="image" src="https://github.com/user-attachments/assets/df678686-fd4c-4d33-bd54-969ace121789" />
+
 17. Внешнее соединение RIGHT OUTER JOIN
 
 17.1 Получить все удостоверения дипломата и, при наличии данных, дату истечения срока действия паспортов дипломатов
@@ -265,6 +291,16 @@ FROM identity.passport p
 RIGHT JOIN papers.diplomatCertificate d ON p.fullName = d.fullName;
 ```
 ![фото](select_join_screenshots/17_1.png)
+
+17.2 Получить все преступления и сопоставить к ним людей
+```sql
+select fullname, description
+from identity.passport right join identity.biometry b on b.id = passport.biometry
+                       right join criminal.record r on b.id = r.biometryid
+                       right join criminal."case" c on r.crimeid = c.id
+                       right join criminal.casetype c2 on c.casetype_id = c2.id;
+```
+<img width="505" height="164" alt="image" src="https://github.com/user-attachments/assets/f2b4893b-5923-4c2f-9e16-a47b5870864c" />
 
 18. Перекрестное соединение CROSS JOIN
 
@@ -276,6 +312,13 @@ LIMIT 10;
 ```
 ![фото](select_join_screenshots/18_1.png)
 
+18.2 Переженить всех
+```sql
+select distinct p1.fullname as "Муж", p2.fullname as "Жена"
+from identity.passport p1, identity.passport p2
+```
+<img width="341" height="266" alt="image" src="https://github.com/user-attachments/assets/953d00e4-b34e-41ec-ad8f-3222f05ba86f" />
+
 19. Запросы на выборку из нескольких таблиц
 
 19.1 Получить все записи о том, из какой страны в какую можно въезжать, но вместо ID их названия
@@ -286,3 +329,13 @@ INNER JOIN identity.country c1 ON perm.fromId = c1.id
 INNER JOIN identity.country c2 ON perm.toId = c2.id;
 ```
 ![фото](select_join_screenshots/19_1.png)
+
+19.2 Получить все преступления и сопоставить к ним людей
+```sql
+select fullname, description
+from identity.passport right join identity.biometry b on b.id = passport.biometry
+                       right join criminal.record r on b.id = r.biometryid
+                       right join criminal."case" c on r.crimeid = c.id
+                       right join criminal.casetype c2 on c.casetype_id = c2.id;
+```
+<img width="505" height="164" alt="image" src="https://github.com/user-attachments/assets/f2b4893b-5923-4c2f-9e16-a47b5870864c" />
