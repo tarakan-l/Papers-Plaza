@@ -110,6 +110,14 @@ WHERE fullName = 'Джеки Чан';
 ```
 ![фото](select_join_screenshots/7_1.png)
 
+7.2 Получить все предметы с русскими названиями
+```sql
+select itemName
+from items.luggageitemtype
+where not(itemname ~ '^[A-Za-z]+$');
+```
+<img width="181" height="74" alt="image" src="https://github.com/user-attachments/assets/5c65f29b-d151-4cd9-9d70-aee7f7e48380" />
+
 8. Выборка данных, логические операции
 
 8.1 Получить паспорта пользователей, чьё ФИО больше 10 букв и у которых есть биометрия
@@ -119,6 +127,14 @@ FROM identity.passport
 WHERE LENGTH(fullname) > 10 AND biometry IS NOT NULL;
 ```
 ![фото](select_join_screenshots/8_1.png)
+
+8.2 Получить описания всех предметов у которых длина слова большье 30 и Id > 2
+```sql
+select description
+from criminal.casetype
+where length(description) < 30 and id > 2;
+```
+<img width="202" height="80" alt="image" src="https://github.com/user-attachments/assets/c5b3cf08-ec21-4050-af44-afc44eef0fae" />
 
 9. Выборка данных, оператор BETWEEN
 
@@ -130,6 +146,14 @@ WHERE LENGTH(fullname) BETWEEN 3 AND 10;
 ```
 ![фото](select_join_screenshots/9_1.png)
 
+9.2 Получить описание всех преступлений с названием от 20 до 40 символов
+```sql
+select description
+from criminal.casetype
+where length(description) between 20 and 40;
+```
+<img width="205" height="49" alt="image" src="https://github.com/user-attachments/assets/c9691a01-b3ab-4b05-b73b-f2af8326ec50" />
+
 10. Выборка данных, оператор IN
 
 10.1 Получить ФИО и ID пользователей с паспортами из Китая(4) и России(1)
@@ -139,6 +163,14 @@ FROM identity.passport
 WHERE country IN (1, 4);
 ```
 ![фото](select_join_screenshots/10_1.png)
+
+10.2 Получить все преступления Id которых на 1 и не 3
+```sql
+select description
+from criminal.casetype
+where id not in (1, 3);
+```
+<img width="270" height="84" alt="image" src="https://github.com/user-attachments/assets/678af50b-4dae-4bad-ad3f-7b075fedbec8" />
 
 11. Выборка данных с сортировкой
 
@@ -150,6 +182,14 @@ ORDER BY fullname;
 ```
 ![фото](select_join_screenshots/11_1.png)
 
+11.2 Получить все преступления в обратном порядке по Id
+```sql
+select description
+from criminal.casetype
+order by id desc;
+```
+<img width="268" height="131" alt="image" src="https://github.com/user-attachments/assets/440ab32c-184c-4e1c-a4f3-7a1612720d5c" />
+
 12. Выборка данных, оператор LIKE
 
 12.1 Получить ФИО пользователей с паспортами, у которых в ФИО присутствует буква Д
@@ -160,6 +200,14 @@ WHERE fullname LIKE '%Д%';
 ```
 ![фото](select_join_screenshots/12_1.png)
 
+12.2 Получить названия всех предметов у которых в названии два слова
+```sql
+select itemName
+from items.luggageitemtype
+where itemname like '_% _%';
+```
+<img width="169" height="52" alt="image" src="https://github.com/user-attachments/assets/84a6331a-6b28-41f2-ba75-b2e808e44f39" />
+
 13. Выбор уникальных элементов столбца
 
 13.1 Получить ID стран, куда можно въезжать иностранцам
@@ -168,6 +216,14 @@ SELECT DISTINCT toId
 FROM identity.citizenEntryPermission;
 ```
 ![фото](select_join_screenshots/13_1.png)
+
+13.2 Получить уникальные названия всех предметов у которых в названии два слова 
+```sql
+select distinct itemName
+from items.luggageitemtype
+where itemname like '_% _%';
+```
+<img width="169" height="52" alt="image" src="https://github.com/user-attachments/assets/84a6331a-6b28-41f2-ba75-b2e808e44f39" />
 
 14. Выбор ограниченного количества возвращаемых строк.
 
