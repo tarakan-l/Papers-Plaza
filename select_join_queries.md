@@ -6,6 +6,13 @@ SELECT * FROM identity.country;
 ```
 ![фото](select_join_screenshots/1_1.png)
 
+1.2 Получить все данные таблицы криминальных случаев
+```sql
+SELECT * FROM criminal."case";
+```
+<img width="363" height="136" alt="image" src="https://github.com/user-attachments/assets/18430a60-a024-4997-9495-757616bf9bd3" />
+
+
 
 2. Выборка отдельных столбцов
 
