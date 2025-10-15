@@ -12,8 +12,6 @@ SELECT * FROM criminal."case";
 ```
 <img width="363" height="136" alt="image" src="https://github.com/user-attachments/assets/18430a60-a024-4997-9495-757616bf9bd3" />
 
-
-
 2. Выборка отдельных столбцов
 
 2.1 Получить названия всех стран
@@ -22,6 +20,11 @@ SELECT name FROM identity.country;
 ```
 ![фото](select_join_screenshots/2_1.png)
 
+2.2 Получить название всех типов предметов
+```sql
+select itemName from items.LuggageItemType;
+```
+<img width="180" height="113" alt="image" src="https://github.com/user-attachments/assets/ae681671-df53-48ac-bd3b-892f224f6438" />
 
 3. Присвоение новых имен столбцам при формировании выборки
 
@@ -32,6 +35,11 @@ FROM identity.passport;
 ```
 ![фото](select_join_screenshots/3_1.png)
 
+3.2 Получить из списка предметов и подставить заголовок "Название предмета" в колонку
+```sql
+select itemName as "Название предмета" from items.LuggageItemType;
+```
+<img width="270" height="110" alt="image" src="https://github.com/user-attachments/assets/70e186be-a7fe-40df-9224-9d85a82f30b8" />
 
 4. Выборка данных с созданием вычисляемого столбца
 
@@ -43,6 +51,11 @@ FROM identity.passport;
 ```
 ![фото](select_join_screenshots/4_1.png)
 
+4.2 Получить таблицу преступлений и вычисляемым столбцом с Id > 2
+```sql
+select description, id > 2 as Id_BiggerThenTwo from Criminal.CaseType;
+```
+<img width="545" height="140" alt="image" src="https://github.com/user-attachments/assets/528f1159-1258-40ad-9489-431d8b840be9" />
 
 5. Выборка данных, вычисляемые столбцы, математические функции
 
@@ -52,6 +65,12 @@ SELECT fullName, sqrt(id) as square_root
 FROM identity.passport;
 ```
 ![фото](select_join_screenshots/5_1.png)
+
+5.2 Получить все криминальные случаи и их Id помноженным на число Pi
+```sql
+select description, id * pi() as "Id and pi" from Criminal.CaseType;
+```
+<img width="531" height="136" alt="image" src="https://github.com/user-attachments/assets/1185fc17-0f1f-4c11-80fd-5965cc2dc09e" />
 
 6. Выборка данных, вычисляемые столбцы, логические функции
 
@@ -66,6 +85,20 @@ END AS validTag
 FROM identity.passport;
 ```
 ![фото](select_join_screenshots/6_1.png)
+
+6.2 Получить все предметы и проставить какие из них на английском
+```sql
+select itemName,
+       case
+           when itemName ~ '^[A-Za-z]+$'
+               then '[Английский]'
+           else '[Русский]'
+           end
+           as Is_English
+from items.LuggageItemType;
+```
+<img width="407" height="114" alt="image" src="https://github.com/user-attachments/assets/41ac5424-cbb0-4161-bbdd-899731013865" />
+
 
 7. Выборка данных по условию
 
