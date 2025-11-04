@@ -8,10 +8,15 @@ WHERE d.issuedate =
 ```
 ![фото](sub_queries_screenshots/1_1.png)
 
+1.2 Получить название первой страны (но более странным способом)
+```sql
+SELECT (SELECT name FROM identity.country LIMIT 1) AS name;
+```
+![фото](sub_queries_screenshots/1_2.png)
 
 2. FROM()
 
-2.1 Получить кол-во каждого предметав, существующего в багаже 
+2.1 Получить кол-во каждого предметов, существующих в багаже 
 ```sql
 SELECT subquery.luggage_item_name, subquery.item_count
 FROM (SELECT li.id as luggage_item_id, li.itemname AS luggage_item_name, COUNT(li.luggage_id) as item_count
@@ -21,6 +26,17 @@ WHERE subquery.item_count >= 1;
 ```
 ![фото](sub_queries_screenshots/2_1.png)
 
+2.2 Получить паспорта пользователей, чьё ФИО больше 10 букв и у которых есть биометрия
+```sql
+SELECT *
+FROM (
+    SELECT *
+    FROM identity.passport
+    WHERE LENGTH(fullname) > 10
+) as users
+WHERE users.biometry IS NOT NULL;
+```
+![фото](sub_queries_screenshots/2_2.png)
 
 3. WHERE()
 
@@ -34,6 +50,16 @@ WHERE wp.validUntil =
  WHERE wp2.validUntil > CURRENT_DATE);
 ```
 ![фото](sub_queries_screenshots/3_1.png)
+
+3.2 Получить самый новый паспорт
+```sql
+SELECT * FROM identity.passport p
+WHERE p.issuedate = (
+    SELECT MAX(p2.issuedate)
+    FROM identity.passport p2
+);
+```
+![фото](sub_queries_screenshots/3_2.png)
 
 
 4. HAVING()
@@ -49,10 +75,21 @@ HAVING country IN (SELECT DISTINCT countryOfIssue
 ```
 ![фото](sub_queries_screenshots/4_1.png)
 
+4.2 Получить количество паспортов из каждой страны, кроме тех, у которых id больше, чем у США
+```sql
+SELECT country, COUNT(*) as num
+FROM identity.passport
+GROUP BY country
+HAVING country <= (
+    SELECT id FROM identity.country WHERE name = 'США'
+);
+```
+![фото](sub_queries_screenshots/4_2.png)
+
 
 5. ALL()
 
-5.1 Получить вакцины хоть раз упоянутые в справках о вакцинации
+5.1 Получить вакцины хоть раз упомянутые в справках о вакцинации
 ```sql
 SELECT v.name
 FROM papers.vaccine v
