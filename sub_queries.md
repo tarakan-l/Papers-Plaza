@@ -100,6 +100,22 @@ WHERE v.id = ANY (
 ```
 ![фото](sub_queries_screenshots/5_1.png)
 
+5.2 Получить все страны, где не живёт Гаррье Дюбуа, но живёт хоть кто-то
+```sql
+SELECT *
+FROM identity.country c
+WHERE (
+    SELECT DISTINCT id
+    FROM identity.passport
+    WHERE name = 'Гаррье Дюбуа' 
+) <> ALL (
+    SELECT DISTINCT id
+    FROM identity.passport p
+    WHERE p.country = c.id
+);
+```
+![фото](sub_queries_screenshots/5_1.png)
+
 
 6. IN()
 
@@ -178,7 +194,7 @@ WHERE EXISTS (
 
 9. Сравнение по нескольким столбцам
 
-9.1 Получить фальшивых сертефикаты дипломатов: тех, данных которых нет в паспортах
+9.1 Получить фальшивые сертификаты дипломатов: те, которых нет в соответствующих паспортах
 ```sql
 SELECT * FROM papers.diplomatcertificate d
 WHERE (d.fullname, d.countryOfIssue) NOT IN (
@@ -187,8 +203,6 @@ WHERE (d.fullname, d.countryOfIssue) NOT IN (
 );
 ```
 ![фото](sub_queries_screenshots/9_1.png)
-
-
 
 
 ## Коррелированные подзапросы
