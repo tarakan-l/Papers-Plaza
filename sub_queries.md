@@ -129,6 +129,16 @@ WHERE wp.validUntil < ANY (
 ```
 ![фото](sub_queries_screenshots/7_1.png)
 
+7.2 Получить те страны, откуда есть паспорта
+```sql
+SELECT *
+FROM identity.country
+WHERE id = ANY (
+    SELECT country FROM identity.passport
+);
+```
+![фото](sub_queries_screenshots/7_2.png)
+
 
 8. EXIST()
 
@@ -143,6 +153,18 @@ WHERE EXISTS (
 );
 ```
 ![фото](sub_queries_screenshots/8_1.png)
+
+8.2 Получить те страны, откуда есть паспорта
+```sql
+SELECT *
+FROM identity.country c
+WHERE EXISTS (
+    SELECT 1 
+    FROM identity.passport p
+    WHERE c.id = p.country
+);
+```
+![фото](sub_queries_screenshots/7_2.png)
 
 
 9. Сравнение по нескольким столбцам
