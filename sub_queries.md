@@ -115,6 +115,15 @@ WHERE country IN (
 ```
 ![фото](sub_queries_screenshots/6_1.png)
 
+6.2 Получить те страны, откуда есть паспорта
+```sql
+SELECT *
+FROM identity.country
+WHERE id IN (
+    SELECT DISTINCT country FROM identity.passport
+);
+```
+![фото](sub_queries_screenshots/7_2.png)
 
 7. ANY()
 
