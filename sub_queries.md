@@ -14,6 +14,14 @@ SELECT (SELECT name FROM identity.country LIMIT 1) AS name;
 ```
 ![фото](sub_queries_screenshots/1_2.png)
 
+1.3 Получить тип предмета багажа с самым длинным названием
+```sql
+SELECT * FROM items.luggageitemtype it
+WHERE length(it.itemname) = (SELECT MAX(length(it2.itemname)) FROM items.luggageitemtype it2);
+```
+<img width="326" height="46" alt="image" src="https://github.com/user-attachments/assets/25c2cfa1-20c3-449f-badd-d02c8da9f7a8" />
+
+
 2. FROM()
 
 2.1 Получить кол-во каждого предметов, существующих в багаже 
@@ -38,6 +46,12 @@ WHERE users.biometry IS NOT NULL;
 ```
 ![фото](sub_queries_screenshots/2_2.png)
 
+2.3 Получить название последнего типа предмета багажа по ID
+```sql
+SELECT (SELECT itemName FROM items.luggageitemtype Order by id desc LIMIT 1) AS name;
+```
+<img width="151" height="53" alt="image" src="https://github.com/user-attachments/assets/c782fbf8-928d-477b-8a20-98f8e72ff74d" />
+
 3. WHERE()
 
 3.1 Получить разрешение на работу с ближайшим сроком истечения его действительности
@@ -61,6 +75,15 @@ WHERE p.issuedate = (
 ```
 ![фото](sub_queries_screenshots/3_2.png)
 
+3.3 Получить ID биометрий, которые встречаются более чем в одном криминальном деле
+```sql
+SELECT subquery.biometryid
+FROM (SELECT biometryid, count(crimeid) as crimes
+      from criminal.record
+      group by biometryid) as subquery
+WHERE crimes > 1;
+```
+<img width="198" height="54" alt="image" src="https://github.com/user-attachments/assets/f4b840f6-925b-465f-a424-3e0b5bb59758" />
 
 4. HAVING()
 
@@ -85,7 +108,18 @@ HAVING country <= (
 );
 ```
 ![фото](sub_queries_screenshots/4_2.png)
-
+4.3 Получить криминальные дела с количеством участников больше одного
+```sql
+SELECT crimeid, COUNT(biometryid) as people
+FROM criminal.record
+GROUP BY crimeid
+HAVING crimeid IN (SELECT crimeid
+                      FROM (SELECT crimeid, count(biometryid) as crimes
+                            from criminal.record
+                            group by crimeid) as subquery
+                      WHERE crimes > 1);
+```
+<img width="363" height="46" alt="image" src="https://github.com/user-attachments/assets/04ae5b93-8ae8-4369-b27e-e0e1054cf0e3" />
 
 5. ALL()
 
@@ -116,6 +150,11 @@ WHERE (
 ```
 ![фото](sub_queries_screenshots/5_1.png)
 
+5.3 Проверить, больше ли число 2 всех значений биометрии в криминальных записях
+```sql
+SELECT 2 > ALL(SELECT distinct biometryid from criminal.record);
+```
+<img width="183" height="58" alt="image" src="https://github.com/user-attachments/assets/41bfbebf-65df-4e7e-8bac-d56556783985" />
 
 6. IN()
 
@@ -141,6 +180,19 @@ WHERE id IN (
 ```
 ![фото](sub_queries_screenshots/7_2.png)
 
+6.3 Получить криминальные дела с количеством участников больше одного (альтернативный вариант)
+```sql
+SELECT crimeid, COUNT(biometryid) as people
+FROM criminal.record
+GROUP BY crimeid
+HAVING crimeid IN (SELECT crimeid
+                   FROM (SELECT crimeid, count(biometryid) as crimes
+                         from criminal.record
+                         group by crimeid) as subquery
+                   WHERE crimes > 1);
+```
+<img width="375" height="58" alt="image" src="https://github.com/user-attachments/assets/79bef923-f22a-4e46-abcd-260522593ef1" />
+
 7. ANY()
 
 7.1 Получить разрешения на работу, дата выпуска которых меньше любой даты выпуска всех сертефикатов дипломатов
@@ -164,6 +216,11 @@ WHERE id = ANY (
 ```
 ![фото](sub_queries_screenshots/7_2.png)
 
+7.3 Проверить, больше ли число 3 любого значения биометрии в криминальных записях
+```sql
+select 3 > ANY(SELECT distinct biometryid from criminal.record);
+```
+<img width="169" height="52" alt="image" src="https://github.com/user-attachments/assets/93b202fb-b8f6-4e59-8ecf-1bbbece83243" />
 
 8. EXIST()
 
@@ -191,6 +248,17 @@ WHERE EXISTS (
 ```
 ![фото](sub_queries_screenshots/7_2.png)
 
+8.3 Получить криминальные записи, где biometryid равен 1 или 2
+```sql
+SELECT *
+FROM criminal.record
+WHERE EXISTS (
+    SELECT 1
+    FROM (VALUES (1), (2)) AS allowed_ids(id)
+    WHERE allowed_ids.id = criminal.record.biometryid
+);
+```
+<img width="404" height="113" alt="image" src="https://github.com/user-attachments/assets/05c3f673-75e2-4267-9b21-a291e87fa97d" />
 
 9. Сравнение по нескольким столбцам
 
@@ -204,6 +272,12 @@ WHERE (d.fullname, d.countryOfIssue) NOT IN (
 ```
 ![фото](sub_queries_screenshots/9_1.png)
 
+9.3 Получить криминальные записи с конкретными комбинациями crimeid и biometryid
+```sql
+SELECT * FROM criminal.record
+WHERE (crimeid, biometryid) in ((1, 2),(2, 3));
+```
+<img width="406" height="56" alt="image" src="https://github.com/user-attachments/assets/3441c618-3ea0-4d9c-a922-1c62d2c9913d" />
 
 ## Коррелированные подзапросы
 
