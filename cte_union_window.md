@@ -1,4 +1,4 @@
-<img width="445" height="188" alt="image" src="https://github.com/user-attachments/assets/fe1b7cb6-deed-4a2a-99c4-04d104e22ae6" />1. CTE
+1. CTE
 
 1.1 Получение количества преступлений у преступников
 ```
