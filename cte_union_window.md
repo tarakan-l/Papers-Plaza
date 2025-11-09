@@ -1,6 +1,6 @@
 1. CTE
 
-1.1 Получение количества преступлений у преступников
+1.1. Получение количества преступлений у преступников
 ```
 with criminals as
     (select biometryid, count(crimeid) as crimeCount
@@ -13,7 +13,7 @@ join identity.passport on biometry = criminals.biometryid;
 ```
 <img width="411" height="104" alt="image" src="https://github.com/user-attachments/assets/0ec5d029-762b-4c48-88b5-a2accbf63a90" />
 
-1.2 Альтернативное получение всех предметов через временную таблицу
+1.2. Альтернативное получение всех предметов через временную таблицу
 ```
 with uselessItems as
     (select itemname
@@ -25,9 +25,9 @@ select uselessItems from uselessItems;
 
 2. UNION, INTERSECT, EXCEPT запросики
 
-2.1 Union
+2.1. Union
 
-2.1.1 Объединение всех типов преступлений и предметов в одну таблицу
+2.1.1. Объединение всех типов преступлений и предметов в одну таблицу
 ```
 select *
 from criminal.casetype
@@ -37,9 +37,9 @@ from items.luggageitemtype;
 ```
 <img width="456" height="383" alt="image" src="https://github.com/user-attachments/assets/ba3625c0-c898-411c-9e1f-635bf02a6ae0" />
 
-2.2 Intersect
+2.2. Intersect
 
-2.2.1 Получение всех преступлений из массива и фильтрация их по другой таблице
+2.2.1. Получение всех преступлений из массива и фильтрация их по другой таблице
 ```
 select *
 from criminal.casetype
@@ -52,9 +52,9 @@ where id = 3;
 <img width="449" height="61" alt="image" src="https://github.com/user-attachments/assets/0d70c625-66f2-4566-8423-808c646c3be7" />
 
 
-2.3 Except
+2.3. Except
 
-2.3.1 Получение всех типов преступлений кроме тех, у которых id между 3 и 6
+2.3.1. Получение всех типов преступлений кроме тех, у которых id между 3 и 6
 ```
 select *
 from criminal.casetype
@@ -67,7 +67,7 @@ where id between 3 and 6;
 
 3. Partition by
 
-3.1 Выборка всех типов преступлений по Id и количество совершенных случаев этих преступлений
+3.1. Выборка всех типов преступлений по Id и количество совершенных случаев этих преступлений
 ```
 select distinct 
     casetype_id,
@@ -80,7 +80,7 @@ from criminal.case;
 
 5. Pows and range
 
-5.1 Получение всех случаев преступлений и значения равному сумму типов преступлений в двух столбцах до этого и этого столбца
+5.1. Получение всех случаев преступлений и значения равному сумму типов преступлений в двух столбцах до этого и этого столбца
 ```
 select 
     id,
@@ -91,7 +91,7 @@ from criminal.case;
 
 6. Функции смещения
 
-6.1 Получение первого номера случая по какому то типуц преступлений
+6.1. Получение первого номера случая по какому то типуц преступлений
 ```
 select distinct 
     casetype_id,
