@@ -1,26 +1,48 @@
 INSERT INTO
     identity.country (name)
-VALUES ('Россия'),
+VALUES 
+    ('Россия'),
     ('США'),
     ('КНДР'),
-    ('Китай');
+    ('Китай'),
+    ('Казахстан'),
+    ('Германия'),
+    ('Афганистан'),
+    ('Мексика'),
+    ('Нигер');
 
 INSERT INTO
     identity.citizenEntryPermission (fromId, toId)
 VALUES 
     (1, 4),
+    (1, 5),
     (2, 1),
     (2, 4),
+    (2, 5),
+    (2, 6),
+    (2, 8),
     (3, 1),
     (4, 1),
-    (4, 2);
+    (4, 2),
+    (4, 5),
+    (4, 6),
+    (5, 1),
+    (5, 2),
+    (5, 4),
+    (6, 1),
+    (6, 2),
+    (8, 2);
 
 INSERT INTO identity.biometry DEFAULT VALUES;
-
 INSERT INTO identity.biometry DEFAULT VALUES;
-
 INSERT INTO identity.biometry DEFAULT VALUES;
-
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
+INSERT INTO identity.biometry DEFAULT VALUES;
 INSERT INTO identity.biometry DEFAULT VALUES;
 
 INSERT INTO
@@ -52,6 +74,55 @@ VALUES
         '2021-01-01',
         3,
         1
+    ),
+    (
+        'Виктор Корнеплод',
+        '2000-11-11',
+        '2222-11-11',
+        4,
+        7
+    ),
+    (
+        'Хайзенбургер',
+        '2010-03-04',
+        '2020-01-02',
+        5,
+        2
+    ),
+    (
+        'Штирлиц',
+        '1941-06-22',
+        '1945-05-09',
+        6,
+        6
+    ),
+    (
+        'Нилл Киггерс',
+        '2024-02-22',
+        '2028-07-08',
+        7,
+        9
+    ),
+    (
+        'Нэйт Хиггерс',
+        '2023-02-22',
+        '2028-01-08',
+        8,
+        9
+    ),
+    (
+        'Давид Маркович',
+        '2023-02-02',
+        '2034-01-01',
+        9,
+        1
+    ),
+    (
+        'Стив Луис',
+        '2010-03-04',
+        '2020-01-02',
+        10,
+        2
     );
 
 INSERT INTO
