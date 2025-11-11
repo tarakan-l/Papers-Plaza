@@ -38,6 +38,32 @@ where country in (select id from allowedCountries);
 ```
 ![фото](c_u_w_screenshots/1_3.png)
 
+1.4 Получить справку дипломата и страну
+```sql
+WITH diplomatCerteficateWithCountry AS 
+    (SELECT dc.id AS diplomatcertificateId, dc.fullname, dc.issuedate, dc.validuntil, c.name 
+    FROM papers.diplomatcertificate dc
+    INNER JOIN identity.country c
+    ON dc.countryofissue = c.id
+    WHERE validuntil > CURRENT_DATE)
+
+SELECT * FROM diplomatCerteficateWithCountry;
+```
+![фото](c_u_w_screenshots/1_4.png)
+
+1.5 Получить разрешение на работу со страной
+```sql
+WITH workPermissionWithCountry AS 
+    (SELECT * FROM papers.workpermission wp
+    INNER JOIN identity.country c
+    ON wp.countryofissue = c.id)
+
+SELECT fullname, name FROM workPermissionWithCountry
+WHERE validuntil > CURRENT_DATE;
+```
+![фото](c_u_w_screenshots/1_5.png)
+
+
 2. UNION, INTERSECT, EXCEPT запросики :3
 
 2.1. Union
@@ -65,6 +91,22 @@ WHERE (SELECT count(*) FROM identity.passport p where p.country = c.id) > 1
 ORDER BY id;
 ```
 ![фото](c_u_w_screenshots/2_1_2.png)
+
+2.1.3 Получить объединение записей из разрешения на работу и дипломатического разрешения
+```sql
+SELECT w.id, w.fullname, c.name, w.issuedate, w.validuntil 
+FROM papers.workpermission w
+JOIN identity.country c
+ON w.countryofissue = c.id
+WHERE w.validuntil > CURRENT_DATE
+UNION
+SELECT dc.id, dc.fullname, c.name, dc.issuedate, dc.validuntil 
+FROM papers.diplomatcertificate dc
+JOIN identity.country c
+ON dc.countryofissue = c.id
+WHERE dc.validuntil > CURRENT_DATE;
+```
+![фото](c_u_w_screenshots/2_1_3.png)
 
 2.2. Intersect
 
@@ -94,6 +136,16 @@ ORDER BY id;
 ```
 ![фото](c_u_w_screenshots/2_2_2.png)
 
+2.2.3 Получить записи, которые есть в дипломатическом разрешении и разрешении на въезд
+```sql
+SELECT e.fullname, e.issuedate, e.validuntil 
+FROM papers.entrypermission e
+INTERSECT
+SELECT dc.fullName, dc.issuedate, dc.validuntil
+FROM papers.diplomatcertificate dc;
+```
+![фото](c_u_w_screenshots/2_2_3.png)
+
 2.3. Except
 
 2.3.1. Получение всех типов преступлений кроме тех, у которых id между 3 и 6
@@ -122,6 +174,17 @@ ORDER BY id;
 ```
 ![фото](c_u_w_screenshots/2_3_2.png)
 
+2.3.3 Получить записи, которые есть в дипломатическом разрешении, но которых нет вразрешении на въезд
+```sql
+SELECT e.fullname, e.issuedate, e.validuntil 
+FROM papers.entrypermission e
+EXCEPT
+SELECT dc.fullName, dc.issuedate, dc.validuntil
+FROM papers.diplomatcertificate dc;
+```
+![фото](c_u_w_screenshots/2_3_3.png)
+
+
 3. Partition by
 
 3.1. Выборка всех типов преступлений по Id и количество совершенных случаев этих преступлений
@@ -133,6 +196,18 @@ from criminal.case;
 ```
 
 <img width="387" height="184" alt="image" src="https://github.com/user-attachments/assets/7ad5d559-e49c-47a2-b0ed-3dc7d0fc872e" />
+
+3.2. Кол-во дипломатов и одной страны
+```sql
+SELECT DISTINCT
+    c.name AS country_name,
+    COUNT(*) OVER(PARTITION BY d.countryofissue) AS diplomate_count
+FROM papers.diplomatcertificate d
+JOIN identity.country c
+ON d.countryofissue = c.id;
+```
+![фото](c_u_w_screenshots/3_2.png)
+
 
 4. Partition by + order by
 
@@ -146,6 +221,25 @@ from identity.passport
 order by country, id;
 ```
 ![фото](c_u_w_screenshots/4_1.png)
+
+4.2. Получить место, где поставили вакцину и номер этой вакцины 
+```sql
+WITH serteficateAndVaccine AS
+    (SELECT v.id AS vaccineId, vc.issueByWhom, v.name AS vaccineName
+    FROM papers.vaccinationcertificate vc
+    JOIN papers.diseasevaccine dv
+    ON vc.id = dv.vaccinationcertificateid
+    JOIN papers.vaccine v
+    ON dv.vaccineid = v.id)
+
+SELECT 
+    vaccineId,
+    issueByWhom,
+    ROW_NUMBER() OVER (PARTITION BY issueByWhom ORDER BY vaccineId) AS vaccine_count
+FROM serteficateAndVaccine
+```
+![фото](c_u_w_screenshots/4_2.png)
+
 
 5. Rows and range
 
@@ -170,6 +264,7 @@ order by country, id;
 
 <img width="289" height="295" alt="image" src="https://github.com/user-attachments/assets/910a1a77-c656-401c-80f0-3ff80363fcb9" />
 
+
 6. Ранжирующие функции
 
 6.1. Для каждого паспорта - его номер среди других паспортов из той же страны
@@ -182,6 +277,21 @@ from identity.passport
 order by country, id;
 ```
 ![фото](c_u_w_screenshots/6_1.png)
+
+6.2. Получить два вида ранда для ID вакцины
+```sql
+SELECT 
+    v.name AS vaccine_name,
+    RANK() OVER (PARTITION BY v.id ORDER BY vc.issuebywhom) AS issuer_rank,
+    DENSE_RANK() OVER (PARTITION BY v.id ORDER BY vc.issuebywhom) AS issuer_rank
+FROM papers.vaccine v
+JOIN papers.diseasevaccine dv
+ON v.id = dv.vaccineid
+JOIN papers.vaccinationcertificate vc
+ON dv.vaccinationcertificateid = vc.id;
+```
+![фото](c_u_w_screenshots/6_2.png)
+
 
 7. Функции смещения
 
@@ -205,3 +315,16 @@ from identity.passport
 order by country, id;
 ```
 ![фото](c_u_w_screenshots/7_2.png)
+
+7.3. Получить смещение имени работника на 1 назад и на 1 вперед
+```sql
+SELECT
+    a.description AS activity_type,
+    wp.fullname,
+    LAG(wp.fullname) OVER (ORDER BY wp.id) AS lag,
+    LEAD(wp.fullname) OVER (ORDER BY wp.id) AS Lead
+FROM papers.workpermission wp
+JOIN papers.activity a
+ON wp.activityid = a.id;
+```
+![фото](c_u_w_screenshots/7_3.png)

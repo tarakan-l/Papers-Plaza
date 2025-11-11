@@ -281,13 +281,16 @@ INSERT INTO Criminal.CaseType (description)
 VALUES ('Украл сладкий рулет'),
     ('Убил человека'),
     ('Побег из тюрьмы'),
-    ('Сделал пост в сети');
-INSERT INTO Criminal.Case
-        (casetype_id)
-        VALUES (1),
-            (2),
-            (3),
-            (4);
+    ('Сделал пост в сети'),
+    ('Оказался не в том месте'),
+    ('Продавал марихуану'),
+    ('.крутой'),
+    ('Взломал пентагон'),
+    ('Неуплата налогов'),
+    ('Крупная взятка');
+INSERT INTO Criminal.Case (casetype_id)
+VALUES (1), (2), (3), (4), (4), (3), (3), (5), (4), (6);
+
 INSERT INTO Items.Luggage DEFAULT
 VALUES;
 INSERT INTO Items.Luggage DEFAULT
@@ -318,18 +321,3 @@ WHERE id = 1;
 UPDATE Items.LuggageItemType
 SET itemName = 'Лабубу'
 WHERE id = 2;
-insert into criminal.case
-        (casetype_id)
-        values (4),
-            (3),
-            (3),
-            (5),
-            (4),
-            (6);
-insert into criminal.casetype (description)
-values ('Оказался не в том месте'),
-    ('Продавал марихуану'),
-    ('.крутой'),
-    ('Взломал пентагон'),
-    ('Неуплата налогов'),
-    ('Крупная взятка');
