@@ -136,14 +136,14 @@ from criminal.case;
 
 4. Partition by + order by
 
-4.1. плавный подсчёт количества совершенных преступлений для каждого типа преступлений
+4.1. Плавный подсчёт количество паспортов из каждой страны
 ```sql
 select distinct 
-    casetype_id,
+    country,
     id,
-    count (*) over (partition by casetype_id order by id)
-from criminal.case
-order by casetype_id, id;
+    count (*) over (partition by country order by id)
+from identity.passport
+order by country, id;
 ```
 ![фото](c_u_w_screenshots/4_1.png)
 
@@ -157,11 +157,35 @@ select
 from criminal.case;
 ```
 
+5.2. Для каждой страны для каждого паспорта средний id из id этого паспорта и id предыдущего
+```sql
+select 
+    country,
+    id,
+    avg (id) over (partition by country order by id rows between 1 preceding and current row)
+from identity.passport
+order by country, id;
+```
+![фото](c_u_w_screenshots/5_2.png)
+
 <img width="289" height="295" alt="image" src="https://github.com/user-attachments/assets/910a1a77-c656-401c-80f0-3ff80363fcb9" />
 
-6. Функции смещения
+6. Ранжирующие функции
 
-6.1. Получение первого номера случая по какому то типуц преступлений
+6.1. Для каждого паспорта - его номер среди других паспортов из той же страны
+```sql
+select 
+    country,
+    id,
+    row_number () over (partition by country order by id)
+from identity.passport
+order by country, id;
+```
+![фото](c_u_w_screenshots/6_1.png)
+
+7. Функции смещения
+
+7.1. Получение первого номера случая по какому то типу преступлений
 ```sql
 select distinct 
     casetype_id,
@@ -170,3 +194,14 @@ from criminal.case;
 ```
 
 <img width="445" height="188" alt="image" src="https://github.com/user-attachments/assets/5f978af0-d003-4c91-8367-d8babcd01094" />
+
+7.2. Получение чела с наибольшим id для каждой страны
+```sql
+select 
+    country,
+    id,
+    last_value (id) over (partition by country order by id rows between current row and unbounded following)
+from identity.passport
+order by country, id;
+```
+![фото](c_u_w_screenshots/7_2.png)
