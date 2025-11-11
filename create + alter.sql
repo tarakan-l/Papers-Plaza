@@ -9,7 +9,7 @@
 CREATE SCHEMA identity;
 
 CREATE TABLE identity.country (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL
 );
 

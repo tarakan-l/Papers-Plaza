@@ -1,7 +1,5 @@
-INSERT INTO
-    identity.country (name)
-VALUES 
-    ('Россия'),
+INSERT INTO identity.country (name)
+VALUES ('Россия'),
     ('США'),
     ('КНДР'),
     ('Китай'),
@@ -11,10 +9,8 @@ VALUES
     ('Мексика'),
     ('Нигер');
 
-INSERT INTO
-    identity.citizenEntryPermission (fromId, toId)
-VALUES 
-    (1, 4),
+INSERT INTO identity.citizenEntryPermission (fromId, toId)
+VALUES (1, 4),
     (1, 5),
     (2, 1),
     (2, 4),
@@ -32,29 +28,36 @@ VALUES
     (6, 1),
     (6, 2),
     (8, 2);
-
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-INSERT INTO identity.biometry DEFAULT VALUES;
-
-INSERT INTO
-    identity.passport (
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.biometry DEFAULT
+VALUES;
+INSERT INTO identity.passport (
         fullName,
         issueDate,
         validUntil,
         biometry,
         country
     )
-VALUES 
-    (
+VALUES (
         'Иван Иваныч',
         '2025-01-01',
         '2026-01-01',
@@ -124,33 +127,24 @@ VALUES
         10,
         2
     );
-
-INSERT INTO
-    papers.vaccine (name)
-VALUES 
-    ('БЦЖ'),
+INSERT INTO papers.vaccine (name)
+VALUES ('БЦЖ'),
     ('вакцина Солка'),
     ('вакцина против гепатита В'),
     ('вакцина против тифа'),
     ('пневмококовая вакцина');
-
-INSERT INTO
-    papers.activity (description)
-VALUES 
-    ('IT Specialist'),
+INSERT INTO papers.activity (description)
+VALUES ('IT Specialist'),
     ('Engineer'),
     ('Doctor');
-
-INSERT INTO
-    papers.workPermission (
+INSERT INTO papers.workPermission (
         issueDate,
         validUntil,
         fullName,
         countryOfIssue,
         activityid
     )
-VALUES 
-    (
+VALUES (
         '2025-01-01',
         '2026-01-01',
         'Ivan Ivanov',
@@ -171,16 +165,13 @@ VALUES
         2,
         3
     );
-
-INSERT INTO
-    papers.entryPermission (
+INSERT INTO papers.entryPermission (
         issueDate,
         validUntil,
         countryOfIssue,
         fullName
     )
-VALUES
-    (
+VALUES (
         '2025-02-01',
         '2025-08-01',
         1,
@@ -197,16 +188,25 @@ VALUES
         '2025-10-01',
         4,
         'Michael Johnson'
+    ),
+    (
+        '2020-01-01',
+        '2030-01-01',
+        4,
+        'Джеки Чан'
+    ),
+    (
+        '2020-01-01',
+        '2021-01-01',
+        1,
+        'Гаррье Дюбуа'
     );
-
-INSERT INTO
-    papers.vaccinationCertificate (
+INSERT INTO papers.vaccinationCertificate (
         issueDate,
         validUntil,
         issueByWhom
     )
-VALUES
-    (
+VALUES (
         '2024-01-01',
         '2030-01-01',
         'WHO Clinic Berlin'
@@ -221,16 +221,13 @@ VALUES
         '2029-12-15',
         'Moscow Health Department'
     );
-
-INSERT INTO
-    papers.diplomatCertificate (
+INSERT INTO papers.diplomatCertificate (
         issueDate,
         validUntil,
         fullName,
         countryOfIssue
     )
-VALUES
-    (
+VALUES (
         '2025-01-01',
         '2027-01-01',
         'Sergey Petrov',
@@ -253,92 +250,84 @@ VALUES
         '2026-05-01',
         'Гаррье Дюбуа',
         1
+    ),
+    (
+        '2020-01-01',
+        '2030-01-01',
+        'Джеки Чан',
+        4
+    ),
+    (
+        '2020-01-01',
+        '2021-01-01',
+        'Гаррье Дюбуа',
+        1
     );
-
-INSERT INTO
-    papers.diseaseVaccine (
+INSERT INTO papers.diseaseVaccine (
         vaccineId,
         vaccinationCertificateId
     )
-VALUES 
-    (1, 1), -- БЦЖ в сертификате 1 
-    (2, 2), -- вакцина Солка в сертификате 2 
-    (3, 3), -- вакцина против гепатита В в сертификате 3 
-    (1, 2), -- БЦЖ тоже в сертификате 2 
+VALUES (1, 1),
+    -- БЦЖ в сертификате 1 
+    (2, 2),
+    -- вакцина Солка в сертификате 2 
+    (3, 3),
+    -- вакцина против гепатита В в сертификате 3 
+    (1, 2),
+    -- БЦЖ тоже в сертификате 2 
     (4, 3);
 -- вакцина против тифа в сертификате 3
-
-INSERT INTO
-    Criminal.CaseType (description)
-VALUES 
-    ('Украл сладкий рулет'),
+INSERT INTO Criminal.CaseType (description)
+VALUES ('Украл сладкий рулет'),
     ('Убил человека'),
     ('Побег из тюрьмы'),
     ('Сделал пост в сети');
-
-INSERT INTO
-    Criminal.Case (casetype_id)
-VALUES 
-    (1),
-    (2),
-    (3),
-    (4);
-
-INSERT INTO Items.Luggage DEFAULT VALUES;
-INSERT INTO Items.Luggage DEFAULT VALUES;
-INSERT INTO Items.Luggage DEFAULT VALUES;
-INSERT INTO Items.Luggage DEFAULT VALUES;
-
-INSERT INTO
-    Items.LuggageItemType (itemName)
-VALUES 
-    ('Пистолет'),
+INSERT INTO Criminal.Case
+        (casetype_id)
+        VALUES (1),
+            (2),
+            (3),
+            (4);
+INSERT INTO Items.Luggage DEFAULT
+VALUES;
+INSERT INTO Items.Luggage DEFAULT
+VALUES;
+INSERT INTO Items.Luggage DEFAULT
+VALUES;
+INSERT INTO Items.Luggage DEFAULT
+VALUES;
+INSERT INTO Items.LuggageItemType (itemName)
+VALUES ('Пистолет'),
     ('Абобус'),
     ('Laptop');
-
-INSERT INTO
-    Items.LuggageItem (itemtype_id, luggage_id)
-VALUES 
-    (1, 1),
+INSERT INTO Items.LuggageItem (itemtype_id, luggage_id)
+VALUES (1, 1),
     (2, 1),
     (3, 2);
-
-INSERT INTO
-    Criminal.Record (crimeId, biometryId)
-VALUES 
-    (1, 1),
+INSERT INTO Criminal.Record (crimeId, biometryId)
+VALUES (1, 1),
     (1, 2),
     (3, 2),
     (4, 3);
-
 UPDATE Items.LuggageItemType
-SET
-    itemName = 'Пистолет ПМ'
-WHERE
-    id = 1;
-
+SET itemName = 'Пистолет ПМ'
+WHERE id = 1;
 UPDATE Criminal.CaseType
-SET
-    description = 'Кража драгоценностей из музея'
-WHERE
-    id = 1;
-
-UPDATE Items.LuggageItemType SET itemName = 'Лабубу' WHERE id = 2;
-
-insert into
-    criminal.case (casetype_id)
-values 
-    (4),
-    (3),
-    (3),
-    (5),
-    (4),
-    (6);
-
-insert into
-    criminal.casetype (description)
-values 
-    ('Оказался не в том месте'),
+SET description = 'Кража драгоценностей из музея'
+WHERE id = 1;
+UPDATE Items.LuggageItemType
+SET itemName = 'Лабубу'
+WHERE id = 2;
+insert into criminal.case
+        (casetype_id)
+        values (4),
+            (3),
+            (3),
+            (5),
+            (4),
+            (6);
+insert into criminal.casetype (description)
+values ('Оказался не в том месте'),
     ('Продавал марихуану'),
     ('.крутой'),
     ('Взломал пентагон'),
