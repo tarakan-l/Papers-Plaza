@@ -10,7 +10,7 @@ CREATE SCHEMA identity;
 
 CREATE TABLE identity.country (
     id SERIAL PRIMARY KEY
-    -- name VARCHAR(20) NOT NULL
+    name VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE identity.citizenEntryPermission (
@@ -134,7 +134,7 @@ CREATE TABLE People.Entrant (
     PRIMARY KEY (passportId)
 );
 
-ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
+-- ALTER TABLE identity.country ADD COLUMN name VARCHAR(20) NOT NULL;
 
 ALTER TABLE Items.LuggageItem
 ADD COLUMN weight DECIMAL(9, 4) DEFAULT 0.0;
