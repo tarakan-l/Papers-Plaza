@@ -120,7 +120,7 @@ WHERE id IN (
 )
 ORDER BY id;
 ```
-![фото](c_u_w_screenshots2_3_2.png)
+![фото](c_u_w_screenshots/2_3_2.png)
 
 3. Partition by
 
@@ -136,7 +136,18 @@ from criminal.case;
 
 4. Partition by + order by
 
-5. Pows and range
+4.1. плавный подсчёт количества совершенных преступлений для каждого типа преступлений
+```sql
+select distinct 
+    casetype_id,
+    id,
+    count (*) over (partition by casetype_id order by id)
+from criminal.case
+order by casetype_id, id;
+```
+![фото](c_u_w_screenshots/4_1.png)
+
+5. Rows and range
 
 5.1. Получение всех случаев преступлений и значения равному сумму типов преступлений в двух столбцах до этого и этого столбца
 ```sql
