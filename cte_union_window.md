@@ -1,3 +1,5 @@
+<img width="1000" height="1000" alt="image" src="https://github.com/user-attachments/assets/b81921fe-a6b2-4c43-a247-ea0ac3971592" />
+
 1. CTE
 
 1.1. Получение количества преступлений у преступников
