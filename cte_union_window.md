@@ -1,3 +1,5 @@
+<img width="1000" height="1000" alt="image" src="https://github.com/user-attachments/assets/b81921fe-a6b2-4c43-a247-ea0ac3971592" />
+
 1. CTE
 
 1.1. Получение количества преступлений у преступников
@@ -292,6 +294,15 @@ ON dv.vaccinationcertificateid = vc.id;
 ```
 ![фото](c_u_w_screenshots/6_2.png)
 
+6.3 Получить "твердый" ранг Id при партиции по casetype_id
+```sql
+select distinct 
+    casetype_id,
+    dense_rank() over (partition by casetype_id order by id)
+from criminal."case"
+order by casetype_id;
+```
+<img width="426" height="293" alt="image" src="https://github.com/user-attachments/assets/f6d31058-195f-4546-a5c0-0d6e35bd7790" />
 
 7. Функции смещения
 
