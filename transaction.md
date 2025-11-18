@@ -1,3 +1,5 @@
+<img width="1064" height="1198" alt="изображение" src="https://github.com/user-attachments/assets/a44d2ed7-0f4b-49d8-95ab-22ae1e01ceb1" />
+
 ## Базовые транзакции
 
 1. COMMIT
