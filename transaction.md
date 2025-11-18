@@ -190,7 +190,7 @@ await Task.WhenAll(insert, read);
 
 using Npgsql;
 
-string ConnectionString = "Host=localhost;Username=postgres;Password=9492;Database=PapersPlease";
+string ConnectionString = "Host=localhost;Username=postgres;Password=;Database=PapersPlease";
 
 bool canEdit = false;
 bool canTryAgain = false;
@@ -366,7 +366,7 @@ await Task.WhenAll(insert, read);
 
 using Npgsql;
 
-string ConnectionString = "Host=localhost;Username=postgres;Password=9492;Database=PapersPlease";
+string ConnectionString = "Host=localhost;Username=postgres;Password=;Database=PapersPlease";
 
 bool canStart = false;
 bool canCommit = false;
