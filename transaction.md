@@ -264,6 +264,33 @@ await Task.WhenAll(insert, read);
 
 ![фото](transactions_screenshots/5_1.png)
 
+5.2. Попытка получить предмет из багажа с id=3 до и после
+
+```sql
+-- T1
+BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+SELECT itemName FROM Items.LuggageItemType WHERE id = 3;
+
+-- T2
+BEGIN;
+UPDATE Items.LuggageItemType
+SET itemName = 'Laptop v2'
+WHERE id = 3;
+
+COMMIT;
+
+-- T1
+SELECT itemName FROM Items.LuggageItemType WHERE id = 3;
+
+COMMIT;
+```
+
+![фото](transactions_screenshots/5_2_do.png)
+
+![фото](transactions_screenshots/5_2_posle.png)
+
+
 6. REPEATABLE READ - Невидимые изменения
 
 6.1. Попытка считать количество пользователей до изменения и после
@@ -271,6 +298,39 @@ await Task.WhenAll(insert, read);
 Код как выше, только IsolationLevel.RepeatableRead
 
 ![фото](transactions_screenshots/6_1.png)
+
+
+6.2. Попытка получить предмет из багажа с id=3 до и после
+
+```sql
+-- T1
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+SELECT itemName FROM Items.LuggageItemType WHERE id = 3;
+
+-- T2
+BEGIN;
+UPDATE Items.LuggageItemType
+SET itemName = 'Laptop super pro'
+WHERE id = 3;
+
+COMMIT;
+
+-- T1
+SELECT itemName FROM Items.LuggageItemType WHERE id = 3;
+
+COMMIT;
+
+
+-- new query
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT itemName FROM Items.LuggageItemType WHERE id = 3;
+COMMIT;
+```
+
+![фото](transactions_screenshots/6_2_before_commit.png)
+![фото](transactions_screenshots/6_2_after_commit.png)
+![фото](transactions_screenshots/6_2_new_query.png)
 
 7. REPEATABLE READ - Фантомное чтение
 
@@ -359,6 +419,47 @@ await Task.WhenAll(insert, read);
 ```
 
 ![фото](transactions_screenshots/7_1.png)
+
+
+7.2. Попытка получить кол-во разрешений на работу до записи и после: запись заблокоровалась из-за того, что фантомы блокируются
+
+```sql
+-- T1
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+SELECT COUNT(*) 
+FROM papers.workPermission;
+
+-- T2
+BEGIN;
+
+INSERT INTO papers.workPermission (
+        issueDate,
+        validUntil,
+        fullName,
+        countryOfIssue,
+        activityid
+    )
+VALUES (
+        '2025-02-10',
+        '2029-10-01',
+        'Viktor Korneplod',
+        2,
+        1
+    );
+
+COMMIT;
+
+-- T1
+SELECT COUNT(*) 
+FROM papers.workPermission;
+-- снова N (фантом НЕ виден)
+COMMIT;
+```
+
+![фото](transactions_screenshots/7_2_before_commit.png)
+![фото](transactions_screenshots/7_2_after_commit.png)
+
 
 8. SERIALIZABLE - Фантомное чтение
 
@@ -459,3 +560,40 @@ await Task.WhenAll(insert, read);
 Исполнение умирает как только начинается второй update
 В консоли: F1 Update, и всё
 
+8.2. попытка записать одинаковые PK в таблицу Record
+```sql
+-- преждевременное удаление записи
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+DELETE FROM Criminal.Record
+WHERE crimeId = 4 AND biometryId = 1;
+COMMIT;
+
+-- T1
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+INSERT INTO Criminal.Record (crimeId, biometryId)
+VALUES (4, 1);
+
+-- T2
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+INSERT INTO Criminal.Record (crimeId, biometryId)
+VALUES (4, 1);
+
+-- T1
+COMMIT;
+
+--T2
+COMMIT;
+```
+
+![фото](transactions_screenshots/8_2_first_insert.png)
+
+Затем СУБД ушел в зависание:
+pgAdmin ничего не возвращал, но внизу шел таймер.
+
+![фото](transactions_screenshots/8_2_waiting.png)
+
+При разрешении одного у T2 появлялась ошибка:
+
+![фото](transactions_screenshots/8_2_second.png)
