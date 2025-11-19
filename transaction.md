@@ -35,6 +35,20 @@ WHERE fullName = 'Евгений Жидко';
 COMMIT;
 ```
 
+1.2 Использование тразакции:
+```sql
+begin;
+select * from items.luggageitem;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (select id from new_item limit 1) where id = 3;
+select * from items.luggageitem;
+commit;
+```
+
 2. ROLLBACK
 
 2.1. Добавление нового пользователя, а потом присвоение ему новой биометрии (ROLLBACK-версия)
@@ -76,6 +90,27 @@ ROLLBACK;
 После rollback
 ![фото](transactions_screenshots/2_1_posle.png)
 
+2.1 То же самое но с rollback
+```sql
+begin;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (select id from new_item limit 1) where id = 3;
+select * from items.luggageitemtype;
+rollback;
+select * from items.luggageitemtype;
+commit;
+```
+
+ДО:
+<img width="336" height="214" alt="image" src="https://github.com/user-attachments/assets/c2c81513-b0b6-46d6-8b26-fba793c034a9" />
+ПОСЛЕ:
+<img width="335" height="191" alt="image" src="https://github.com/user-attachments/assets/2643b515-24e8-4bda-b06d-bc854a1361c8" />
+
+
 3. ERROR
 
 3.1. Добавление нового пользователя с невозможным id
@@ -99,6 +134,27 @@ INSERT INTO identity.passport (
 
 ROLLBACK;
 ```
+
+3.2 Ошибка синтаксиса
+```sql
+begin;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (selectm limit 1) where id = 3;
+select * from items.luggageitemtype;
+rollback;
+select * from items.luggageitemtype;
+commit;
+```
+ДО:
+<img width="345" height="206" alt="image" src="https://github.com/user-attachments/assets/07ead956-6263-4097-9ab0-56c64bacc624" />
+ПОСЛЕ:
+<img width="345" height="206" alt="image" src="https://github.com/user-attachments/assets/561a3d46-cd8a-43fe-9957-3832b926e8e6" />
+ОШИБКА:
+<img width="573" height="74" alt="image" src="https://github.com/user-attachments/assets/beda8d0c-4f06-4868-8211-45cf162b4a0e" />
 
 ## Isolation levels
 
