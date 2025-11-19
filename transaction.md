@@ -35,6 +35,20 @@ WHERE fullName = 'Евгений Жидко';
 COMMIT;
 ```
 
+1.2 Использование тразакции:
+```sql
+begin;
+select * from items.luggageitem;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (select id from new_item limit 1) where id = 3;
+select * from items.luggageitem;
+commit;
+```
+
 2. ROLLBACK
 
 2.1. Добавление нового пользователя, а потом присвоение ему новой биометрии (ROLLBACK-версия)
@@ -76,6 +90,27 @@ ROLLBACK;
 После rollback
 ![фото](transactions_screenshots/2_1_posle.png)
 
+2.1 То же самое но с rollback
+```sql
+begin;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (select id from new_item limit 1) where id = 3;
+select * from items.luggageitemtype;
+rollback;
+select * from items.luggageitemtype;
+commit;
+```
+
+ДО:
+<img width="336" height="214" alt="image" src="https://github.com/user-attachments/assets/c2c81513-b0b6-46d6-8b26-fba793c034a9" />
+ПОСЛЕ:
+<img width="335" height="191" alt="image" src="https://github.com/user-attachments/assets/2643b515-24e8-4bda-b06d-bc854a1361c8" />
+
+
 3. ERROR
 
 3.1. Добавление нового пользователя с невозможным id
@@ -99,6 +134,27 @@ INSERT INTO identity.passport (
 
 ROLLBACK;
 ```
+
+3.2 Ошибка синтаксиса
+```sql
+begin;
+with new_item as (
+    insert into items.luggageitemtype (itemname) values ('Плюшевая игрушка')
+    returning id
+)
+
+update items.luggageitem set itemtype_id = (selectm limit 1) where id = 3;
+select * from items.luggageitemtype;
+rollback;
+select * from items.luggageitemtype;
+commit;
+```
+ДО:
+<img width="345" height="206" alt="image" src="https://github.com/user-attachments/assets/07ead956-6263-4097-9ab0-56c64bacc624" />
+ПОСЛЕ:
+<img width="345" height="206" alt="image" src="https://github.com/user-attachments/assets/561a3d46-cd8a-43fe-9957-3832b926e8e6" />
+ОШИБКА:
+<img width="573" height="74" alt="image" src="https://github.com/user-attachments/assets/beda8d0c-4f06-4868-8211-45cf162b4a0e" />
 
 ## Isolation levels
 
@@ -597,6 +653,46 @@ pgAdmin ничего не возвращал, но внизу шел тайме�
 При разрешении одного у T2 появлялась ошибка:
 
 ![фото](transactions_screenshots/8_2_second.png)
+
+
+9.1 Использование сохранения
+```sql
+begin;
+savepoint aboba;
+select * from items.luggageitem;
+update items.luggageitem set itemtype_id = 3 where id = 2;
+select * from items.luggageitem;
+rollback to aboba;
+```
+<img width="1076" height="466" alt="image" src="https://github.com/user-attachments/assets/42ee7f93-d395-46f0-bced-8060a2ecd7aa" />
+
+9.2 Использование двух сохранений
+```sql
+begin;
+savepoint aboba;
+select * from items.luggageitem;
+update items.luggageitem set itemtype_id = 3 where id = 2;
+select * from items.luggageitem;
+rollback to aboba;
+
+savepoint abobus;
+update items.luggageitem set itemtype_id = 3 where id = 1;
+select * from items.luggageitem;
+rollback to abobus;
+
+insert into items.luggageitem (itemtype_id, luggage_id) values (6, 3);
+select * from items.luggageitem;
+commit;
+```
+первый селект:
+<img width="574" height="175" alt="image" src="https://github.com/user-attachments/assets/aaef0171-c822-4945-b28a-460d1f3f91f5" />
+второй:
+<img width="560" height="130" alt="image" src="https://github.com/user-attachments/assets/c5e48ae0-793f-4995-b08c-b3d2a2d0def8" />
+третий:
+<img width="564" height="142" alt="image" src="https://github.com/user-attachments/assets/cd68daee-4312-4c99-96af-86eea6d16125" />
+четвертый:
+<img width="568" height="163" alt="image" src="https://github.com/user-attachments/assets/20244125-5ed7-44f0-94a2-13b5efa69dbd" />
+
 
 10. Один SAVEPOINT
 
