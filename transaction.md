@@ -597,3 +597,75 @@ pgAdmin ничего не возвращал, но внизу шел тайме�
 При разрешении одного у T2 появлялась ошибка:
 
 ![фото](transactions_screenshots/8_2_second.png)
+
+10. Один SAVEPOINT
+
+10. Запрос для добавления вакцины и ее обновление (вне зависимости от обновлениия вакцина должна быть добавлена)
+```sql
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SELECT * FROM papers.vaccine;
+COMMIT;
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+INSERT INTO papers.vaccine (name)
+VALUES ('вакцина от ОСПЫ новая');
+
+SAVEPOINT before_insert;
+
+UPDATE papers.vaccine
+SET name = 'вакцина от ОСПЫ без ГМО новая'
+WHERE id = 10;
+
+ROLLBACK TO SAVEPOINT before_insert;
+
+COMMIT;
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SELECT * FROM papers.vaccine;
+COMMIT;
+```
+
+![фото](transactions_screenshots/10_first_select.png)
+![фото](transactions_screenshots/10_second_select.png)
+
+как мы видим добавления произошло, а обновление - нет
+
+11. несколько SAVEPOINT
+
+11. Запрос для добавления вакцины, ее обновление и удаления (вне зависимости от удаления вакцина должна быть добавлена и обновлена)
+
+```sql
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SELECT * FROM papers.vaccine;
+COMMIT;
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+INSERT INTO papers.vaccine (name)
+VALUES ('вакцина от всего');
+
+SAVEPOINT before_insert;
+
+UPDATE papers.vaccine
+SET name = 'вакцина от всего без ГМО'
+WHERE id = 10;
+
+SAVEPOINT before_update;
+
+DELETE FROM papers.vaccine
+WHERE name='вакцина от всего без ГМО';
+
+ROLLBACK TO SAVEPOINT before_update;
+
+COMMIT;
+
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SELECT * FROM papers.vaccine;
+COMMIT;
+```
+
+![фото](transactions_screenshots/11_first_select.png)
+![фото](transactions_screenshots/11_second_select.png)
+
+как мы видим, удаление не произошло
