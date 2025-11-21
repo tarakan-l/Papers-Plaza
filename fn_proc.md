@@ -111,4 +111,25 @@ WHERE routine_type = 'FUNCTION';
 
 10. EXCEPTION
 
+10.1 Попытаться посчитать 1 / 0
+
+```sql
+DO $$
+BEGIN
+    RAISE INFO '1/0 = %', (1 / 0);
+EXCEPTION
+    WHEN division_by_zero THEN
+        RAISE INFO 'Ага, щас, размечтался';
+END $$;
+```
+
 11. RAISE
+
+11.1 Вывести количество паспортов
+
+```sql
+DO $$
+BEGIN
+    RAISE INFO 'Кол-во %', (SELECT COUNT(*) FROM identity.passport);
+END $$;
+```
