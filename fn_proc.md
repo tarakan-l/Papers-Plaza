@@ -109,6 +109,47 @@ WHERE routine_type = 'FUNCTION';
 
 9. WHILE
 
+9.1 Функция проверяет каждый паспорт и определяет, достаточно ли для общей картины валидных паспортов.
+Если невалидных минимум 3, то недостаточно.
+
+```sql
+CREATE OR REPLACE FUNCTION check_enough_valid_passports()
+RETURNS BOOLEAN 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    passports_count INT;
+    i INT := 1;
+    invalid INT := 0;
+    current_date DATE := CURRENT_DATE;
+    is_valid BOOLEAN;
+BEGIN
+    SELECT COUNT(*) INTO passports_count FROM identity.passport;
+
+    WHILE i <= passports_count AND invalid < 3 LOOP
+        SELECT (validUntil > current_date) INTO is_valid
+        FROM identity.passport LIMIT 1 OFFSET (i-1);
+        
+        IF NOT is_valid THEN
+            invalid := invalid + 1;
+            RAISE INFO 'Invalid passport found, now: %', invalid;
+        ELSE
+            RAISE INFO 'Normal passport, demdalsh';
+        END IF;
+        
+        i := i + 1;
+    END LOOP;
+    
+    RETURN invalid < 3;
+END;
+$$;
+
+DO $$
+BEGIN
+    RAISE INFO 'Достаточно ли валидных паспортов: %', check_enough_valid_passports();
+END $$;
+```
+
 10. EXCEPTION
 
 10.1 Попытаться посчитать 1 / 0
