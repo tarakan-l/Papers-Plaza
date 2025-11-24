@@ -32,6 +32,27 @@ $$;
 CALL create_default_user('Евгений Газово', 1);
 ```
 
+1.2. Создание фукции для добавления титулов (префиксов) к именам в пасспортах
+
+```sql
+CREATE OR REPLACE PROCEDURE information_schema.add_prefix_into_person_passport(
+    prefix VARCHAR(10), 
+    in_fullname VARCHAR(100)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    person_fullname VARCHAR(100);
+BEGIN
+    UPDATE identity.passport
+    SET fullname = prefix || in_fullname
+    WHERE fullName = in_fullname;
+END;
+$$;
+
+CALL information_schema.add_prefix_into_person_passport('mr.', 'Штирлиц');
+```
+
 2. Запрос просмотра всех процедур
 
 ```sql
@@ -59,6 +80,33 @@ $$;
 select itemName
 from items.luggageitemtype
 where has_2_words(itemname);
+```
+
+3.2. Функция по получению всех вакцин из сертефиката
+
+```sql
+CREATE OR REPLACE FUNCTION information_schema.get_vaccine_from_certificate(
+    certeficateId INT
+)
+RETURNS TABLE (
+    vaccinationCertificateId INT,
+    vaccineName VARCHAR(100)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT vc.id AS vaccinationCertificateId, v.name AS vaccineName
+    FROM papers.vaccinationCertificate vc
+    JOIN papers.diseaseVaccine dv
+    ON vc.id = dv.vaccinationCertificateId
+    JOIN papers.vaccine v
+    ON dv.vaccineId = v.id
+    WHERE vc.id = certeficateId;
+END;
+$$;
+
+SELECT information_schema.get_vaccine_from_certificate(2);
 ```
 
 4. Функции (с переменными)
@@ -89,6 +137,32 @@ $$;
 select get_last_passport()
 ```
 
+4.2. Функция по получению профессии человека
+
+```sql
+CREATE OR REPLACE FUNCTION information_schema.get_person_work(
+    in_fullname VARCHAR(100)
+)
+RETURNS VARCHAR(100)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    activity VARCHAR(100);
+BEGIN
+    SELECT a.description INTO activity
+    FROM papers.workPermission w
+    JOIN papers.activity a
+    ON w.activityId = a.id
+    WHERE w.fullname = in_fullname; 
+
+    RETURN activity;
+END;
+$$;
+
+SELECT fullname, information_schema.get_person_work(fullname)
+FROM papers.workpermission;
+```
+
 5. Запрос просмотра всех функций
 
 ```sql
@@ -101,11 +175,103 @@ WHERE routine_type = 'FUNCTION';
 
 6. Do
 
+6.1. Анонимная функция для проверки того, что у въезжающий людей есть зарегестрированные документы (предполагалось, что в системе с подтвержденными разрешениями на въезд не может быть незарегестрированных пасспортов, но для проверки был написана функция)
+
+```sql
+DO $$
+DECLARE
+    invalid_person INTEGER;
+BEGIN
+    SELECT COUNT(e.fullName) INTO invalid_person
+    FROM papers.entryPermission e
+    WHERE e.fullName NOT IN (SELECT p.fullName FROM identity.passport p);
+    
+    RAISE INFO 'Найдено % въезжающих без загерестрированных паспортов', invalid_person;
+END $$;
+```
+
 ## Прочее
 
 7. IF
+Функция для получения того, имеет ли зарегестрированный паспорт въезжающий человек
+
+```sql
+CREATE OR REPLACE FUNCTION papers.check_passport_existence()
+RETURNS TABLE(
+    full_name VARCHAR(100),
+    status TEXT,
+    passport_id INTEGER
+) 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    ep_rec RECORD;
+    status_text TEXT;
+    pass_id INTEGER;
+BEGIN
+    FOR ep_rec IN SELECT * FROM papers.entryPermission
+    LOOP
+        -- Проверяем наличие паспорта
+        IF EXISTS (SELECT 1 FROM identity.passport WHERE fullName = ep_rec.fullName) THEN
+            status_text := 'зарегистрирован';
+            pass_id := (SELECT id FROM identity.passport WHERE fullName = ep_rec.fullName LIMIT 1);
+        ELSE
+            status_text := 'не зарегистрирован';
+            pass_id := 0;
+        END IF;
+        
+        full_name := ep_rec.fullName;
+        status := status_text;
+        passport_id := pass_id;
+        RETURN NEXT;
+    END LOOP;
+END;
+$$;
+
+SELECT * FROM papers.check_passport_existence();
+```
 
 8. CASE
+Функция, которая позволяет получить исформацию о документах для въезда с состояниями - "зарегистрирован (действителен)", "зарегистрирован (просрочен)", "не зарегистрирован" 
+
+```sql
+CREATE OR REPLACE FUNCTION papers.check_passport_existence_detailed()
+RETURNS TABLE(
+    full_name VARCHAR(100),
+    status TEXT,
+    passport_id INTEGER
+) 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    ep_rec RECORD;
+    status_text TEXT;
+    pass_id INTEGER;
+BEGIN
+    FOR ep_rec IN SELECT * FROM papers.entryPermission
+    LOOP
+        CASE
+            WHEN EXISTS (SELECT 1 FROM identity.passport WHERE fullName = ep_rec.fullName) AND ep_rec.validUntil >= CURRENT_DATE THEN
+                status_text := 'зарегистрирован (действителен)';
+                pass_id := (SELECT id FROM identity.passport WHERE fullName = ep_rec.fullName LIMIT 1);
+            WHEN EXISTS (SELECT 1 FROM identity.passport WHERE fullName = ep_rec.fullName) AND ep_rec.validUntil < CURRENT_DATE THEN
+                status_text := 'зарегистрирован (просрочен)';
+                pass_id := (SELECT id FROM identity.passport WHERE fullName = ep_rec.fullName LIMIT 1);
+            ELSE
+                status_text := 'не зарегистрирован';
+                pass_id := 0;
+        END CASE;
+        
+        full_name := ep_rec.fullName;
+        status := status_text;
+        passport_id := pass_id;
+        RETURN NEXT;
+    END LOOP;
+END;
+$$;
+
+SELECT * FROM papers.check_passport_existence_detailed();
+```
 
 9. WHILE
 
@@ -148,6 +314,36 @@ DO $$
 BEGIN
     RAISE INFO 'Достаточно ли валидных паспортов: %', check_enough_valid_passports();
 END $$;
+```
+
+9.2. Процедура для создания группы профессий из n рангов
+
+```sql
+CREATE OR REPLACE PROCEDURE information_schema.create_activity_with_n_rank(
+    activity_type VARCHAR(100), 
+    n INT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    i INT := 1;
+BEGIN
+    WHILE i <= n LOOP
+        INSERT INTO papers.activity (description)
+        VALUES (
+            activity_type || '' || i || ' ранга'
+        );
+
+        i := i + 1;
+    END LOOP;
+
+    RAISE NOTICE 'было создано % рангов для профессии', n;
+END;
+$$;
+
+CALL information_schema.create_activity_with_n_rank('столяр', 6);
+
+SELECT * FROM papers.activity;
 ```
 
 10. EXCEPTION
