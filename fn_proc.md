@@ -1,4 +1,4 @@
-## Процедуры
+<img width="325" height="190" alt="image" src="https://github.com/user-attachments/assets/05b819d5-918a-478d-b9cd-4655de3db00b" />## Процедуры
 
 1. Процедуры
 
@@ -52,6 +52,29 @@ $$;
 
 CALL information_schema.add_prefix_into_person_passport('mr.', 'Штирлиц');
 ```
+
+1.3 Изменение названия предмета с помощью фукнции
+```sql
+create or replace procedure updateLuggageItemTypeName(
+    oldItemName varchar(50),
+    newName varChar(50)
+)
+language plpgsql
+as $$
+begin
+update items.luggageitemtype
+    set itemname = newName
+    where itemname = oldItemName;
+end;
+$$;
+
+select * from items.luggageitemtype;
+call updateLuggageItemTypeName('Laptop', 'Ноутбук');
+select * from items.luggageitemtype;
+```
+<img width="323" height="187" alt="image" src="https://github.com/user-attachments/assets/4ebc6b89-24b9-46fc-88c0-f4048f2ba642" />
+<img width="321" height="185" alt="image" src="https://github.com/user-attachments/assets/4b4ae142-b209-4536-b5a1-846777a7ac0c" />
+
 
 2. Запрос просмотра всех процедур
 
@@ -108,6 +131,21 @@ $$;
 
 SELECT information_schema.get_vaccine_from_certificate(2);
 ```
+3.3 Получить максимальный Id из LuggageItemType
+```sql
+create or replace function getMaxItemTypeId()
+returns int
+language plpgsql
+as $$
+    begin
+    return (select max(id) from items.luggageItemType);  
+    end;
+$$
+
+select getMaxItemTypeId();
+```
+<img width="223" height="52" alt="image" src="https://github.com/user-attachments/assets/9273da90-d981-4732-bea8-d6f95387f445" />
+
 
 4. Функции (с переменными)
 
@@ -163,6 +201,25 @@ SELECT fullname, information_schema.get_person_work(fullname)
 FROM papers.workpermission;
 ```
 
+4.3 Получить максимальную длину предмету через функцию
+```sql
+create or replace function getMaxItemTypeName()
+    returns varchar(200)
+    language plpgsql
+as $$
+declare 
+    maxName varchar(200);
+begin
+    select max(itemname) into maxName from items.luggageItemType;
+    return maxName;
+end;
+$$;
+
+select getMaxItemTypeName();
+```
+<img width="242" height="56" alt="image" src="https://github.com/user-attachments/assets/c1feef31-98a7-4a22-9696-efb252d9be0e" />
+
+
 5. Запрос просмотра всех функций
 
 ```sql
@@ -190,7 +247,22 @@ BEGIN
 END $$;
 ```
 
-## Прочее
+6.2 Создание нового предмета анонимно
+```sql
+select * from items.luggageitemtype;
+
+do $$
+begin    
+    
+insert into items.luggageitemtype (id, itemname) values (getMaxItemTypeId() + 1,
+                                                             'Abobus');
+end $$ language  plpgsql;
+
+select * from items.luggageitemtype;
+```
+<img width="325" height="190" alt="image" src="https://github.com/user-attachments/assets/92544d57-bb23-45ab-b2b6-18cc2db8256d" />
+<img width="322" height="213" alt="image" src="https://github.com/user-attachments/assets/1753ee77-c829-4127-b1ad-b33c052624bd" />
+
 
 7. IF
 Функция для получения того, имеет ли зарегестрированный паспорт въезжающий человек
@@ -360,6 +432,15 @@ EXCEPTION
 END $$;
 ```
 
+10.1 Изловить ошибку синтаксиса
+```sql
+do $$
+begin
+raise syntax_error ;
+exception when SYNTAX_ERROR then raise info 'Gotcha';
+end $$ language plpgsql;
+```
+
 11. RAISE
 
 11.1 Вывести количество паспортов
@@ -369,4 +450,13 @@ DO $$
 BEGIN
     RAISE INFO 'Кол-во %', (SELECT COUNT(*) FROM identity.passport);
 END $$;
+```
+
+11.1 Создать ошибку синтаксиса (сам не знаю зачем)
+```sql
+do $$
+begin
+raise syntax_error ;
+exception when SYNTAX_ERROR then raise info 'Gotcha';
+end $$ language plpgsql;
 ```
