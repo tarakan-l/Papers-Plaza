@@ -1,4 +1,4 @@
-<img width="325" height="190" alt="image" src="https://github.com/user-attachments/assets/05b819d5-918a-478d-b9cd-4655de3db00b" />## Процедуры
+## Процедуры
 
 1. Процедуры
 
