@@ -263,6 +263,21 @@ select * from items.luggageitemtype;
 <img width="325" height="190" alt="image" src="https://github.com/user-attachments/assets/92544d57-bb23-45ab-b2b6-18cc2db8256d" />
 <img width="322" height="213" alt="image" src="https://github.com/user-attachments/assets/1753ee77-c829-4127-b1ad-b33c052624bd" />
 
+6.3 Do bi do bi do bi - абсолютно бесполезный, но наглядный пример создания и вызова анонимных функций друг в друге
+```sql
+do $$
+    begin
+        do $$
+            begin
+                do $$
+                    begin
+                        raise syntax_error ;
+                    exception when SYNTAX_ERROR then raise info 'Gotcha';
+                    end $$ language plpgsql;
+            end $$ language plpgsql;
+    end $$ language plpgsql;
+
+```
 
 7. IF
 Функция для получения того, имеет ли зарегестрированный паспорт въезжающий человек
