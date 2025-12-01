@@ -1,8 +1,11 @@
 I. Триггеры
 
+
 1. NEW
 
+
 2. OLD
+
 
 3. BEFORE
 
@@ -29,6 +32,23 @@ FOR EACH ROW
 EXECUTE FUNCTION papers.check_insert_diplomatcertificate();
 ```
 
+```sql
+INSERT INTO papers.diplomatCertificate (
+        issueDate,
+        validUntil,
+        fullName,
+        countryOfIssue
+    )
+VALUES (
+        '2026-01-01',
+        '2030-01-01',
+        'Wrong Person',
+        2
+    )
+```
+![screen](/trigger_cron_screenshots/trigger_3_1.png)
+
+
 4. AFTER
 
 4.1. Триггер для обновления соответствующих данных для въезда пользовалеля при обновлении разрешения на работу
@@ -36,11 +56,11 @@ EXECUTE FUNCTION papers.check_insert_diplomatcertificate();
 CREATE OR REPLACE FUNCTION papers.update_documents()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE papers.entryPermission e
-    SET e.countryOfIssue = NEW.countryOfIssue,
-        e.validUntil = NEW.validUntil,
-        e.issueDate = NEW.issueDate
-    WHERE e.fullName = NEW.fullName;
+    UPDATE papers.entryPermission
+    SET countryOfIssue = NEW.countryOfIssue,
+        validUntil = NEW.validUntil,
+        issueDate = NEW.issueDate
+    WHERE fullName = NEW.fullName;
 
     RETURN NEW;
 END;
@@ -52,6 +72,26 @@ AFTER INSERT OR UPDATE ON papers.workPermission
 FOR EACH ROW
 EXECUTE FUNCTION papers.update_documents();
 ```
+
+```sql
+INSERT INTO papers.workPermission (
+        issueDate,
+        validUntil,
+        fullName,
+        countryOfIssue,
+        activityid
+    )
+VALUES (
+        '2025-03-01',
+        '2030-09-01',
+        'Sam Altman',
+        1,
+        2
+    );
+```
+
+![schemas](/trigger_cron_screenshots/trigger_4_1.png)
+
 
 5. Row level
 
@@ -81,6 +121,17 @@ FOR EACH ROW
 EXECUTE FUNCTION papers.prevent_overlapping_vaccines();
 ```
 
+```sql
+INSERT INTO papers.diseasevaccine (
+        vaccineId,
+        vaccinationCertificateId
+    )
+VALUES (1, 1);
+```
+
+![schemas](/trigger_cron_screenshots/trigger_5_1.png)
+
+
 6. Statement level
 
 6.1. Логгирование массовых изменений в workPermission
@@ -99,6 +150,25 @@ AFTER INSERT ON papers.workPermission
 FOR EACH STATEMENT
 EXECUTE FUNCTION papers.log_bulk_insert_work();
 ```
+
+```sql
+INSERT INTO papers.workPermission (
+        issueDate,
+        validUntil,
+        fullName,
+        countryOfIssue,
+        activityid
+    )
+VALUES (
+        '2025-03-01',
+        '2030-09-01',
+        'Sam Altman',
+        1,
+        2
+    );
+```
+
+![schemas](/trigger_cron_screenshots/trigger_6_1.png)
 
 ---
 II. Отображение списка триггеров
