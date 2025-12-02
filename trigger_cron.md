@@ -233,6 +233,46 @@ SELECT cron.schedule(
 ```
 ![screen](./trigger_cron_screenshots/cron_1.png)
 
+3.2. Еженедельный обзор предметов приезжающих людей
+
+```sql
+SELECT cron.schedule(
+    'Weekly Review of entrant items',
+    '0 0 * * 0',
+    $$
+    SELECT li.id AS item_id, lit.itemName AS item_name
+    FROM Items.LuggageItemType lit
+    JOIN Items.luggageitem li ON li.itemtype_id = lit.id;
+    $$
+);
+```
+![alt text](./trigger_cron_screenshots/cron_2.png)
+
+3.3. 
+
+```sql
+SELECT cron.schedule(
+    'hourly check entrant passports',
+    '0 * * * *',
+    $$ SELECT papers.check_passport_existence_detailed(); $$
+);
+```
+![alt text](./trigger_cron_screenshots/cron_3.png)
+
+
 9. Запрос на просмотр выполнения кронов
 
+```sql
+SELECT * FROM cron.job;
+```
+![alt text](./trigger_cron_screenshots/cron_job.png)
+
+
 10. Запрос на просмотр кронов
+
+```sql
+SELECT * FROM cron.job_run_details
+ORDER BY start_time DESC
+LIMIT 10;
+```
+![alt text](./trigger_cron_screenshots/cron_exists_job.png)
