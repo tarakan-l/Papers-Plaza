@@ -1,4 +1,4 @@
-### Триггеры
+<img width="532" height="511" alt="image" src="https://github.com/user-attachments/assets/99da4566-33db-47fa-91e1-76bbd959ba37" /><img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/74cf9532-6adf-4f09-9d81-eaf6b1a39c70" />### Триггеры
 
 1. NEW 
 
@@ -20,11 +20,44 @@ CREATE TRIGGER before_insert_passport
     FOR EACH ROW
     EXECUTE FUNCTION identity.notify_if_from_kndr();
 ```
-
 ![фото](trigger_cron_screenshots/1.1_regular_insert.png)
 ![фото](trigger_cron_screenshots/1.1_regular_result.png)
 ![фото](trigger_cron_screenshots/1.1_special_insert.png)
 ![фото](trigger_cron_screenshots/1.1_special_result.png)
+
+1.2 Проверка имен предметов на длину
+```sql
+create or replace procedure CheckItemName(name varchar(200))
+language plpgsql
+as $$
+begin
+    case 
+        when length(name)  >200  then raise info 'Как ты вообще смог это сделать';
+        when length(name) between 100 and 199 then raise info 'Довольно длинное имя';
+        when length(name) between 1 and 99 then raise info 'Обычное имя предмета';
+    end case;
+end;
+$$;
+
+
+create or replace function items.CheckItem()
+returns trigger as $$
+begin
+    call CheckItemName(new.itemname);
+    return new;
+end;
+$$ language plpgsql;
+
+create or replace trigger commonItemTypeChecks
+    before insert or update on items.luggageitemtype
+    for each row 
+    execute function items.CheckItem();
+
+insert into items.luggageitemtype (itemname) values ('Очень крутой предмет');
+insert into items.luggageitemtype (itemname) values ('Очень пупер улььтра мега супер дупер пупер ну просто офигенный круто прекрутой прям пипец какой крутой предмет'); 
+```
+<img width="1251" height="119" alt="image" src="https://github.com/user-attachments/assets/09f2da8a-5609-48fb-acde-a9e7d886b008" />
+
 
 2. OLD
 
@@ -46,6 +79,27 @@ CREATE TRIGGER before_country_change
     FOR EACH ROW
     EXECUTE FUNCTION identity.prevent_country_change();
 ```
+2.2 Проверка на изменение имени предмета
+```sql
+create or replace function items.CheckItemBefore()
+returns trigger as $$
+begin
+    if old.itemname = new.itemname then
+        raise exception 'Бро, ты имя то не поменял';
+    end if;
+end;
+$$ language plpgsql;
+
+create or replace trigger beforeItemUpdate
+    before update of itemname on items.luggageitemtype
+    for each row
+    execute function items.CheckItemBefore();
+
+update items.luggageitemtype
+set itemname = 'Пистолет ПМ'
+where id = 1;
+```
+<img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/ae1fb8b7-22d8-48f6-b144-325a3ad942f4" />
 
 3. BEFORE
 
@@ -89,6 +143,27 @@ VALUES (
 ![screen](/trigger_cron_screenshots/trigger_3_1.png)
 <img width="214" height="236" alt="image" src="https://github.com/user-attachments/assets/a4ec8e72-a25d-43c0-9948-f263d8fbeef3" />
 
+3.2 Проверка на изменение имени предмета
+```sql
+create or replace function items.CheckItemBefore()
+returns trigger as $$
+begin
+    if old.itemname = new.itemname then
+        raise exception 'Бро, ты имя то не поменял';
+    end if;
+end;
+$$ language plpgsql;
+
+create or replace trigger beforeItemUpdate
+    before update of itemname on items.luggageitemtype
+    for each row
+    execute function items.CheckItemBefore();
+
+update items.luggageitemtype
+set itemname = 'Пистолет ПМ'
+where id = 1;
+```
+<img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/ae1fb8b7-22d8-48f6-b144-325a3ad942f4" />
 
 4. AFTER
 
@@ -132,6 +207,28 @@ VALUES (
 ```
 
 ![schemas](/trigger_cron_screenshots/trigger_4_1.png)
+4.2 Проверка на изменение имени, вот только поздно уже
+```sql
+create or replace function items.CheckItemBefore()
+returns trigger as $$
+begin
+    if old.itemname != new.itemname then
+        raise exception 'Бро, ты имя то поменял';
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+create or replace trigger beforeItemUpdate
+    after update of itemname on items.luggageitemtype
+    for each row
+    execute function items.CheckItemBefore();
+
+update items.luggageitemtype
+set itemname = 'Пистолет П'
+where id = 1;
+```
+<img width="532" height="511" alt="image" src="https://github.com/user-attachments/assets/122a09e2-2a01-498c-9d95-5682514b9a19" />
 
 5. Row level
 
@@ -168,6 +265,27 @@ INSERT INTO papers.diseasevaccine (
     )
 VALUES (1, 1);
 ```
+5.2 Проверка на изменение имени предмета
+```sql
+create or replace function items.CheckItemBefore()
+returns trigger as $$
+begin
+    if old.itemname = new.itemname then
+        raise exception 'Бро, ты имя то не поменял';
+    end if;
+end;
+$$ language plpgsql;
+
+create or replace trigger beforeItemUpdate
+    before update of itemname on items.luggageitemtype
+    for each row
+    execute function items.CheckItemBefore();
+
+update items.luggageitemtype
+set itemname = 'Пистолет ПМ'
+where id = 1;
+```
+<img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/ae1fb8b7-22d8-48f6-b144-325a3ad942f4" />
 
 ![schemas](/trigger_cron_screenshots/trigger_5_1.png)
 
@@ -208,6 +326,8 @@ VALUES (
 ```
 
 ![schemas](/trigger_cron_screenshots/trigger_6_1.png)
+6.2
+
 
 7. Отображение списка триггеров
 
