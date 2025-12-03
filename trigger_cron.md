@@ -265,6 +265,7 @@ INSERT INTO papers.diseasevaccine (
     )
 VALUES (1, 1);
 ```
+![schemas](/trigger_cron_screenshots/trigger_5_1.png)
 5.2 Проверка на изменение имени предмета
 ```sql
 create or replace function items.CheckItemBefore()
@@ -286,8 +287,6 @@ set itemname = 'Пистолет ПМ'
 where id = 1;
 ```
 <img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/ae1fb8b7-22d8-48f6-b144-325a3ad942f4" />
-
-![schemas](/trigger_cron_screenshots/trigger_5_1.png)
 
 6. Statement level
 
@@ -326,7 +325,42 @@ VALUES (
 ```
 
 ![schemas](/trigger_cron_screenshots/trigger_6_1.png)
-6.2
+6.2 Логирование после целого стейтмента (с приколом)
+```sql
+create or replace function items.logrouletefunction()
+    returns trigger
+    language plpython3u
+as $$
+import random
+
+dice = random.randint(1, 6)
+operation = TD.get("operation", "unknown")
+table = TD.get("table_name", "unknown")
+
+if dice == 1:
+    plpy.notice(f'Сносим system32...')
+    plpy.execute(f"""
+        insert into items.itemlog (table_name, operation, dice_roll, result)
+        values ('{table}', '{operation}', {dice}, 'пипец')
+    """)
+else:
+    plpy.notice(f'выпало {dice}: безопасное действие')
+    plpy.execute(f"""
+        insert into items.itemlog (table_name, operation, dice_roll, result)
+        values ('{table}', '{operation}', {dice}, 'лог')
+    """)
+
+if operation == "delete":
+    return "old"
+return "new"
+$$;
+
+create or replace trigger logRouleteTrigger
+    after insert or update or delete or truncate on items.luggageitemtype
+    for each statement 
+    execute function items.logRouleteFunction();
+```
+(футажа не будет, system32 удалился)
 
 
 7. Отображение списка триггеров
