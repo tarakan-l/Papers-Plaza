@@ -87,6 +87,8 @@ VALUES (
     )
 ```
 ![screen](/trigger_cron_screenshots/trigger_3_1.png)
+<img width="214" height="236" alt="image" src="https://github.com/user-attachments/assets/a4ec8e72-a25d-43c0-9948-f263d8fbeef3" />
+
 
 4. AFTER
 
