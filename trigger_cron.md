@@ -325,6 +325,7 @@ VALUES (
 ```
 
 ![schemas](/trigger_cron_screenshots/trigger_6_1.png)
+
 6.2 Логирование после целого стейтмента (с приколом)
 ```sql
 create or replace function items.logrouletefunction()
