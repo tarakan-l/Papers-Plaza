@@ -1,4 +1,4 @@
-<img width="532" height="511" alt="image" src="https://github.com/user-attachments/assets/99da4566-33db-47fa-91e1-76bbd959ba37" /><img width="582" height="507" alt="image" src="https://github.com/user-attachments/assets/74cf9532-6adf-4f09-9d81-eaf6b1a39c70" />### Триггеры
+### Триггеры
 
 1. NEW 
 
