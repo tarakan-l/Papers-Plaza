@@ -6,3 +6,10 @@ EXPLANATIONS (without indexing)
 <img width="734" height="523" alt="image" src="https://github.com/user-attachments/assets/536d639f-56fd-4226-93a9-df3f8599e939" />
 <img width="751" height="532" alt="image" src="https://github.com/user-attachments/assets/300b4f14-2573-4d36-9fb3-e0e4f066ea1e" />
 
+WITH INDEXES (now faster)
+
+<img width="808" height="412" alt="image" src="https://github.com/user-attachments/assets/ef6ed38f-712a-40b0-a854-9eea8d595654" />
+<img width="712" height="346" alt="image" src="https://github.com/user-attachments/assets/83c018b9-8693-4221-af7d-4e85d2041e46" />
+
+WITH HASH INDEXES 
+
