@@ -22,15 +22,24 @@ INSERT INTO Criminal.CaseType (description)
 VALUES ('Minor'), ('Major'), ('Critical');
 
 -- 3. ТАБЛИЦА 1: identity.passport (250к)
+INSERT INTO identity.biometry (id)
+SELECT i FROM generate_series(1, 250000) AS s(i);
+
 INSERT INTO identity.passport (fullName, issueDate, validUntil, country, metadata, search_vector)
 SELECT
     'Name ' || i,
     '2020-01-01'::date + (i % 365),
     '2030-01-01'::date + (i % 365),
-    (floor(random() * 99) + 1)::int, -- Теперь ID стран гарантированно от 1 до 100
+    (floor(random() * 99) + 1)::int, 
     jsonb_build_object('id', i, 'active', true),
     to_tsvector('english', 'person record ' || i)
 FROM generate_series(1, 250000) AS s(i);
+
+UPDATE identity.passport SET biometry = id;
+
+UPDATE identity.passport
+SET biometry = NULL
+WHERE id % 7 = 0;
 
 -- 4. ТАБЛИЦА 2: Items.Luggage + Items.LuggageItem (250к)
 INSERT INTO Items.Luggage (id)
