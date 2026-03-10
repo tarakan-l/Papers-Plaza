@@ -11,5 +11,9 @@ WITH INDEXES (now faster)
 <img width="808" height="412" alt="image" src="https://github.com/user-attachments/assets/ef6ed38f-712a-40b0-a854-9eea8d595654" />
 <img width="712" height="346" alt="image" src="https://github.com/user-attachments/assets/83c018b9-8693-4221-af7d-4e85d2041e46" />
 
-WITH HASH INDEXES 
+WITH HASH INDEXES (el stupid with LIKE but good with =)
+
+<img width="830" height="332" alt="image" src="https://github.com/user-attachments/assets/ca94a4f7-bbb4-4a90-937d-c08fd076d89c" />
+<img width="789" height="504" alt="image" src="https://github.com/user-attachments/assets/1154f79f-4e0e-4ed1-9dc7-4640c70928ba" />
+
 
