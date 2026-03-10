@@ -18,3 +18,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin_password
     ports:
       - "8080:80"
+  flyway:
+    image: flyway/flyway:9
+    command: -url=jdbc:postgresql://db:5432/main_db -user=postgres -password=1234 -connectRetries=60 migrate
+    volumes:
+      - :/flyway/sql  
+    depends_on:
+      - db
