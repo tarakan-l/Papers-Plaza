@@ -64,3 +64,26 @@ LIMIT 100;
 ```
 
 <img width="811" height="747" alt="image" src="https://github.com/user-attachments/assets/429c250c-edfb-4502-9435-084dbe1eeb39" />
+
+
+-----Graphics and stats---
+
+Version:
+<img width="1445" height="693" alt="image" src="https://github.com/user-attachments/assets/e107c71f-86b7-482c-9e5b-879b37b0a684" />
+
+Active sessions:
+<img width="1404" height="818" alt="image" src="https://github.com/user-attachments/assets/559a6267-c2b2-474a-99de-0539120ec81a" />
+
+Select:
+<img width="1433" height="671" alt="image" src="https://github.com/user-attachments/assets/c5fa7f92-7f47-412d-8aa9-fe919b03d499" />
+
+Insert:
+
+Delete:
+
+
+CPU:
+<img width="1404" height="624" alt="image" src="https://github.com/user-attachments/assets/4e193563-85bf-434d-91a9-8c4fea0aff76" />
+
+
+
