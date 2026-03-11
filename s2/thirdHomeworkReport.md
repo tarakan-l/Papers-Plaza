@@ -74,12 +74,8 @@ Version:
 Active sessions:
 <img width="1404" height="818" alt="image" src="https://github.com/user-attachments/assets/559a6267-c2b2-474a-99de-0539120ec81a" />
 
-Select:
+Select, insert, delete:
 <img width="1433" height="671" alt="image" src="https://github.com/user-attachments/assets/c5fa7f92-7f47-412d-8aa9-fe919b03d499" />
-
-Insert:
-
-Delete:
 
 
 CPU:
