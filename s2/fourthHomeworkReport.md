@@ -34,6 +34,36 @@
 
 После того как Deadlock отловлен Postgre пожертвовал транзакцию Б и отменил её, чтобы отлочить строку Б
 
+Задание 5
+Без share
+
+Транзакция А (ждет коммита)
+
+<img width="758" height="425" alt="image" src="https://github.com/user-attachments/assets/f1b9ccdd-434a-47a4-8f18-fcc67c2696c1" />
+
+Транзакция Б (ждет строки)
+
+<img width="723" height="250" alt="image" src="https://github.com/user-attachments/assets/4d14c50d-2948-49a4-8c93-2533b2468a6a" />
+
+не работает получается...
+а теперь с SHARE:
+Транзакция А (ждет коммита)
+
+<img width="671" height="433" alt="image" src="https://github.com/user-attachments/assets/8a7691b6-ce31-4393-87c0-dd062841c71d" />
+
+Транзакция Б (не ждем строки - она не локнулась для чтения)
+
+<img width="698" height="438" alt="image" src="https://github.com/user-attachments/assets/843631ef-7d51-494b-a385-59c85e90f30b" />
+
+Транзакция Б (теперь пытаемся изменить Updateoм строку но не можем)
+
+<img width="981" height="621" alt="image" src="https://github.com/user-attachments/assets/c2758bc9-aed5-46a6-b76d-d81f2402dbcf" />
+
+Видим что у нас есть lock по конфликтам
+
+<img width="778" height="541" alt="image" src="https://github.com/user-attachments/assets/e2414f05-394b-4475-826e-88b8e6c50c71" />
+
+
 Задание 6
 
 Запускам анализ и видим кучу строк где xmax ~= 0
