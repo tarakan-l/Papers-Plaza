@@ -1,14 +1,17 @@
 Задание 1, 2, 3
 Делаем транзакцию А, не коммитим
 
-<img width="697" height="584" alt="image" src="https://github.com/user-attachments/assets/dec65821-16ae-4dcf-a39b-c30bacf3ceec" />
+<img width="703" height="550" alt="image" src="https://github.com/user-attachments/assets/6593c2a3-fa2b-4434-b7a2-3e16e8297233" />
+
 
 Понял, что t_infomask - битовая маска хранящая состояние строки, биты являются флагами дающие сведения о состоянии строки
 
 Теперь, пока нет комммита выполняем запрос Б
 
-<img width="688" height="346" alt="image" src="https://github.com/user-attachments/assets/6d53d87f-3f0d-4648-aa65-88de0d43bc1e" />
+<img width="694" height="319" alt="image" src="https://github.com/user-attachments/assets/cbbce569-0ad4-483f-821c-e298c6bb46d5" />
 
-коммитим А и в Б теперь получаем 
 
-<img width="707" height="346" alt="image" src="https://github.com/user-attachments/assets/d4a073dc-3244-4886-be62-7876545e8161" />
+коммитим А и в Б теперь получаем изменение маски так как строки освобождены
+
+<img width="697" height="362" alt="image" src="https://github.com/user-attachments/assets/7240b635-904b-4642-8aba-642370f1249f" />
+
