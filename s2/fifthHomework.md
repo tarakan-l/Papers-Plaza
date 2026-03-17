@@ -52,7 +52,47 @@ docker exec -i postgres_boss psql -U postgres dbtest_new < full_dump.sql
 ```
 
 Done! 
+<img width="457" height="377" alt="image" src="https://github.com/user-attachments/assets/2d3f9aa2-aa61-4e54-a84f-f867b1a44499" />
+
+8. Creating a dump with single table: 
+```
+docker exec -t postgres_boss pg_dump -U postgres -t identity.passport dbtest > passport_table.sql
+```
+
+9. Creating seeded data
+```sql
+INSERT INTO Items.LuggageItemType (id, itemName) 
+VALUES (10, 'Musical Instrument'), (11, 'Sport Equipment')
+ON CONFLICT (id) DO UPDATE SET itemName = EXCLUDED.itemName;
+```
 ![Uploading image.png…]()
 
+
+10. Adding with seed if not enlisted
+```sql
+INSERT INTO papers.vaccine (name)
+SELECT 'Experimental Vaccine'
+WHERE NOT EXISTS (
+    SELECT 1 FROM papers.vaccine WHERE name = 'Experimental Vaccine'
+);
+```
+![Uploading image.png…]()
+
+11. Adding if unique
+```sql
+INSERT INTO identity.country (name, code)
+SELECT 'Newland', 'NL'
+WHERE 'NL' NOT IN (SELECT code FROM identity.country);
+
+```
+![Uploading image.png…]()
+
+12. Adding mass
+```sql
+INSERT INTO identity.country (name, code)
+SELECT 'Country_' || i, (i % 99)::text -- Будут коды '1', '2' ... '98'
+FROM generate_series(500, 600) AS s(i)
+ON CONFLICT DO NOTHING;
+```
 
 
