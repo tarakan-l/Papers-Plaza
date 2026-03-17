@@ -7,7 +7,7 @@
 INSERT INTO identity.country (name, code) VALUES ('WAL_TEST', 'WT');
 ```
 
-![Uploading image.png…]()
+<img width="1059" height="199" alt="image" src="https://github.com/user-attachments/assets/7b67a3cd-05f6-4209-92af-8363821c6bb5" />
 
 4. Checking massive operation (using LSN that I wrote before operation)
 ```sql
@@ -18,4 +18,5 @@ SET metadata = metadata || '{"wal_check": "done"}';
 SELECT pg_wal_lsn_diff(pg_current_wal_lsn(), '0/4C204490') / 1024 / 1024 AS wal_mb_generated;
 ```
 
-![Uploading image.png…]()
+<img width="962" height="239" alt="image" src="https://github.com/user-attachments/assets/2435c80b-4450-485b-a57b-9ff6e3c538a2" />
+
