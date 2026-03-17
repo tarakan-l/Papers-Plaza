@@ -65,7 +65,8 @@ INSERT INTO Items.LuggageItemType (id, itemName)
 VALUES (10, 'Musical Instrument'), (11, 'Sport Equipment')
 ON CONFLICT (id) DO UPDATE SET itemName = EXCLUDED.itemName;
 ```
-![Uploading image.png…]()
+<img width="308" height="498" alt="image" src="https://github.com/user-attachments/assets/f21452e1-817a-4d4a-95bf-f9c701012395" />
+
 
 
 10. Adding with seed if not enlisted
@@ -76,7 +77,8 @@ WHERE NOT EXISTS (
     SELECT 1 FROM papers.vaccine WHERE name = 'Experimental Vaccine'
 );
 ```
-![Uploading image.png…]()
+<img width="1498" height="731" alt="image" src="https://github.com/user-attachments/assets/72bd185a-0731-4f8b-98e8-bc435023fd7f" />
+
 
 11. Adding if unique
 ```sql
@@ -85,7 +87,8 @@ SELECT 'Newland', 'NL'
 WHERE 'NL' NOT IN (SELECT code FROM identity.country);
 
 ```
-![Uploading image.png…]()
+<img width="1490" height="715" alt="image" src="https://github.com/user-attachments/assets/9f445450-86dc-4d9c-988c-f5f6f8102370" />
+
 
 12. Adding mass
 ```sql
