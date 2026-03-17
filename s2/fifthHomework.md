@@ -58,6 +58,7 @@ Done!
 ```
 docker exec -t postgres_boss pg_dump -U postgres -t identity.passport dbtest > passport_table.sql
 ```
+<img width="308" height="498" alt="image" src="https://github.com/user-attachments/assets/f21452e1-817a-4d4a-95bf-f9c701012395" />
 
 9. Creating seeded data
 ```sql
@@ -65,9 +66,9 @@ INSERT INTO Items.LuggageItemType (id, itemName)
 VALUES (10, 'Musical Instrument'), (11, 'Sport Equipment')
 ON CONFLICT (id) DO UPDATE SET itemName = EXCLUDED.itemName;
 ```
-<img width="308" height="498" alt="image" src="https://github.com/user-attachments/assets/f21452e1-817a-4d4a-95bf-f9c701012395" />
 
 
+<img width="1498" height="731" alt="image" src="https://github.com/user-attachments/assets/72bd185a-0731-4f8b-98e8-bc435023fd7f" />
 
 10. Adding with seed if not enlisted
 ```sql
@@ -77,7 +78,8 @@ WHERE NOT EXISTS (
     SELECT 1 FROM papers.vaccine WHERE name = 'Experimental Vaccine'
 );
 ```
-<img width="1498" height="731" alt="image" src="https://github.com/user-attachments/assets/72bd185a-0731-4f8b-98e8-bc435023fd7f" />
+<img width="1477" height="664" alt="image" src="https://github.com/user-attachments/assets/ff3a0a8e-a37a-4ecc-b9ab-861920af0000" />
+
 
 
 11. Adding if unique
