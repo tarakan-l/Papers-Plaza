@@ -7,7 +7,8 @@
 INSERT INTO identity.country (name, code) VALUES ('WAL_TEST', 'WT');
 ```
 
-<img width="1059" height="199" alt="image" src="https://github.com/user-attachments/assets/7b67a3cd-05f6-4209-92af-8363821c6bb5" />
+<img width="874" height="282" alt="image" src="https://github.com/user-attachments/assets/61c20a31-15be-455f-b140-32fe3261bece" />
+
 
 4. Checking massive operation (using LSN that I wrote before operation)
 ```sql
