@@ -1,3 +1,6 @@
+<img width="1732" height="700" alt="image" src="https://github.com/user-attachments/assets/b0ab0549-3cf0-4b94-bc07-53e7802e1a71" />
+
+
 1. Created new role for replication:
 ```sql
 CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD 'pass';
