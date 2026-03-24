@@ -78,4 +78,64 @@ SELECT 'bulk data ' || i FROM generate_series(1, 100000) s(i);
 <img width="634" height="380" alt="image" src="https://github.com/user-attachments/assets/0d0947c5-841b-4c8b-b7c7-af82d8daf503" />
 
 ---LOGICAL REPLICATION---
-1. 
+1. Setting up replication level
+```bash
+-c wal_level=logical 
+```
+
+2. Creating publication on master
+```sql
+CREATE TABLE logical_demo (id int PRIMARY KEY, name text);
+CREATE PUBLICATION my_publication FOR TABLE logical_demo;
+```
+
+3. Creating a subscription on replicas 
+```sql
+-- 1. Сначала на Реплике создаем такую же структуру
+CREATE TABLE logical_demo (id int PRIMARY KEY, name text);
+
+-- 2. Создаем подписку
+CREATE SUBSCRIPTION my_subscription 
+CONNECTION 'host=db_master port=5432 user=postgres password=1234 dbname=dbtest' 
+PUBLICATION my_publication;
+```
+
+4. Data replicated (source - dude trust me)
+```sql
+INSERT INTO logical_test VALUES (777, 'Logical Success!');
+```
+
+and on replica:
+```sql
+SELECT * FROM logical_test;
+```
+
+<img width="297" height="411" alt="image" src="https://github.com/user-attachments/assets/3aa5e97d-7722-4c01-a705-5f9f9edaedf0" />
+
+5. Trying to DDL
+
+on master:
+```sql
+ALTER TABLE logical_test ADD COLUMN meta_data text;
+```
+
+checking on replica:
+<img width="614" height="420" alt="image" src="https://github.com/user-attachments/assets/310f3563-ae2d-497c-87f6-84dc629444e0" />
+
+
+6. Replica Identity 
+Adding new table without primary key on main
+```sql
+CREATE TABLE identity_test (id int, val text);
+ALTER PUBLICATION my_pub ADD TABLE identity_test;
+```
+
+subrscribing on it in replica, then adding some info to it, then trying to update:
+
+<img width="944" height="261" alt="image" src="https://github.com/user-attachments/assets/6a2547f0-9498-4598-80b5-cf401c1b8106" />
+
+7. Replication status
+
+<img width="648" height="463" alt="image" src="https://github.com/user-attachments/assets/99d9ef11-d04d-416f-af0b-5b950bc60f67" />
+
+
