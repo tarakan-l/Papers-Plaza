@@ -57,6 +57,41 @@ UPDATE не просто "перезаписывает строку" он дел
 - autovacuum - автоматический механизм вакуумирования
 - VACUUM FULL - Полностью пересобирает таблицу, БЛОКИРУЕТ ЕЁ НА ВРЕМЯ ОПЕРАЦИИ ДЛЯ ЛЮБЫХ ОПЕРАЦИЙ, отдает свободное место обратно на диск
 
-4. 
+4. Задание 4. Блокировки строк
+
+1. Опишите, что происходит с DELETE и UPDATE в сессии B в двух экспериментах. - В первом случае Delete залочился и пока не был сделан Rollback он не executed, во втором кейсе у нас Update - произошел но не затронул строку, но и не был залочен процессом, возвращая Update - 0
+2. Объясните, чем FOR KEY SHARE отличается от FOR NO KEY UPDATE по смыслу и по силе блокировки: For key share - позволяет смотреть и обновлять на строку которая взята в транзакции, no key update позволяет её тоже смотреть, но при изменении ничего не произойдет
+3. Укажите, почему обычный SELECT без FOR KEY SHARE/FOR NO KEY UPDATE ведет себя иначе - 
+4. Кратко поясните, где в прикладных сценариях может использоваться FOR NO KEY UPDATE -
+
+5. Задание 5. Секционирование и partition pruning
+
+```sql
+CREATE TABLE shipment_stats (
+    region_code TEXT NOT NULL,
+    shipped_on DATE NOT NULL,
+    packages INTEGER NOT NULL,
+    avg_weight NUMERIC(8,2)
+) PARTITION BY LIST (region_code);
+
+CREATE TABLE shipment_stats_north 
+    PARTITION OF shipment_stats FOR VALUES IN ('north');
+
+CREATE TABLE shipment_stats_south 
+    PARTITION OF shipment_stats FOR VALUES IN ('south');
+
+CREATE TABLE shipment_stats_west 
+    PARTITION OF shipment_stats FOR VALUES IN ('west');
+
+CREATE TABLE shipment_stats_default 
+    PARTITION OF shipment_stats DEFAULT;
+```
+
+1. Для каждого запроса укажите, есть ли partition pruning - для первого нет, он в одной партиции, для второй - да
+2. Для каждого запроса укажите, сколько секций участвует в плане - в первом одна секция, во втором - все 4 секции
+3. Объясните, почему в одном случае планировщик может отсечь секции, а в другом — нет
+4. Ответьте, связан ли pruning напрямую с наличием обычного индекса - нет, не связан
+5. Кратко объясните, зачем в этом задании нужна секция DEFAULT - чтобы данные не попадающие под фильтры партиции отправлялись именно туда
+
 
 
