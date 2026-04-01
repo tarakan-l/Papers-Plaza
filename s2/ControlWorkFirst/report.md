@@ -16,12 +16,15 @@ WHERE shop_id = 77
 IndexScan - запрос вернул слишком большую таблицу и индексы были менее эффективны чем SeqScan
 HashScan - вообще тут не прошел бы, у нас операции сравнения, а не равенства
 
+
 Создали b-tree index, теперь у нас выполняется через Bitmap scan, т.к. он просто размапил временные интервалы
 Analyze нужен т.к. он обновит в pg_stats наилучший метод поиска а потом он и будет использоваться
 
 ```sql
 CREATE INDEX balbes ON public.store_checks USING btree (sold_at);
 ```
+```text
+Bitmap Heap Scan on store_checks  (cost=21.66..726.44 rows=1 width=26) (actual time=1.217..1.219 rows=3 loops=1)
+```
 
-![Uploading image.png…]()
-
+2. 
