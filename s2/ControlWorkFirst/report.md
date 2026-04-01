@@ -27,4 +27,9 @@ CREATE INDEX balbes ON public.store_checks USING btree (sold_at);
 Bitmap Heap Scan on store_checks  (cost=21.66..726.44 rows=1 width=26) (actual time=1.217..1.219 rows=3 loops=1)
 ```
 
-2. 
+2. Задание 2. Анализ и улучшение JOIN-запроса
+
+До изменений
+
+![Uploading image.png…]()
+
