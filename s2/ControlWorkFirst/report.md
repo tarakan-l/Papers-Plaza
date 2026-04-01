@@ -1,4 +1,4 @@
-<img width="496" height="108" alt="image" src="https://github.com/user-attachments/assets/7a6304a4-a8b9-4045-9423-34fcd3ab6888" />1. Задание 1. Оптимизация простого запроса
+1. Задание 1. Оптимизация простого запроса
 
 Выполняем скриптик
 ```sql
