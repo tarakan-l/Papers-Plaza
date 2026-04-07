@@ -6,5 +6,8 @@ PostrgeSQL видит только orders_2024
 
 2. List
 
-![Uploading image.png…]()
+<img width="945" height="362" alt="image" src="https://github.com/user-attachments/assets/a29f7506-3b5d-4015-88c2-648ce4f081f1" />
 
+3. Hash
+
+![Uploading image.png…]()
