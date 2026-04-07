@@ -18,3 +18,54 @@ PostrgeSQL видит только orders_2024
 ![Uploading image.png…]()
 
 реплика не знает о секционировании т.к. она отсылается байтами на родительскую таблицу - ей просто незачем это
+
+5. Logic replication
+
+```sql
+CREATE PUBLICATION pub_parts FOR TABLE orders_range 
+WITH (publish_via_partition_root = false);
+
+CREATE PUBLICATION pub_root FOR TABLE orders_range 
+WITH (publish_via_partition_root = true);
+```
+
+если с правами = true, то будем просто сразу в таблицу кидать, без секционки, удобно для аналитики чтобы держать большую таблицу вместо мелких секций
+
+6. adding shards and router:
+
+```sql
+CREATE TABLE users_data (id int PRIMARY KEY, name text);
+```
+
+and router:
+```sql
+CREATE EXTENSION postgres_fdw;
+
+CREATE SERVER shard1_server FOREIGN DATA WRAPPER postgres_fdw 
+OPTIONS (host 'db_replica_1', dbname 'dbtest', port '5432');
+
+CREATE SERVER shard2_server FOREIGN DATA WRAPPER postgres_fdw 
+OPTIONS (host 'db_replica_2', dbname 'dbtest', port '5432');
+
+CREATE USER MAPPING FOR postgres SERVER shard1_server OPTIONS (user 'postgres', password '1234');
+CREATE USER MAPPING FOR postgres SERVER shard2_server OPTIONS (user 'postgres', password '1234');
+
+CREATE TABLE users_sharded (id int, name text) PARTITION BY HASH (id);
+
+CREATE FOREIGN TABLE users_shard_0 PARTITION OF users_sharded 
+FOR VALUES WITH (MODULUS 2, REMAINDER 0) SERVER shard1_server OPTIONS (table_name 'users_data');
+
+CREATE FOREIGN TABLE users_shard_1 PARTITION OF users_sharded 
+FOR VALUES WITH (MODULUS 2, REMAINDER 1) SERVER shard2_server OPTIONS (table_name 'users_data');
+```
+
+inserting data:
+```sql
+INSERT INTO users_sharded (id, name)
+SELECT g, 'user_' || g
+FROM generate_series(1, 10) g;
+```
+
+pulling data from shards:
+
+![Uploading image.png…]()
