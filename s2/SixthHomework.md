@@ -1,4 +1,4 @@
-1. Section
+<img width="969" height="603" alt="image" src="https://github.com/user-attachments/assets/f63219ea-9f17-4d5b-85ea-6ff703b8b785" /><img width="359" height="525" alt="image" src="https://github.com/user-attachments/assets/9785ae90-aedd-4cc1-a543-df70e798cfc5" /><img width="706" height="706" alt="icon2" src="https://github.com/user-attachments/assets/7b52aa3a-9410-4edf-bb2b-a364d6c8a14b" /><img width="663" height="392" alt="image" src="https://github.com/user-attachments/assets/fbfb912b-0fac-427f-8f5f-03456568a70b" />1. Section
 
 <img width="1026" height="355" alt="image" src="https://github.com/user-attachments/assets/0bda8b24-1939-4470-b7bb-7a7f4d456379" />
 
@@ -15,7 +15,7 @@ PostrgeSQL видит только orders_2024
 
 4. Секционирование реплики
 
-
+(dude trust me, image didnt upload)
 
 реплика не знает о секционировании т.к. она отсылается байтами на родительскую таблицу - ей просто незачем это
 
@@ -68,5 +68,20 @@ FROM generate_series(1, 10) g;
 
 pulling data from shards:
 
-![Uploading image.png…]()
+<img width="663" height="392" alt="image" src="https://github.com/user-attachments/assets/e44f7860-70e2-4c65-a179-6e6a384fb0f3" />
+
+pulling from single shard:
+
+<img width="660" height="294" alt="image" src="https://github.com/user-attachments/assets/a53cdabe-8fdb-4774-85de-4c8945fe24b4" />
+
+checking data on shards:
+
+```sql
+SELECT * FROM users_data;
+```
+
+<img width="359" height="525" alt="image" src="https://github.com/user-attachments/assets/0ec9fb13-0139-4174-9c15-9c62c36a4d51" />
+
+
+
 
