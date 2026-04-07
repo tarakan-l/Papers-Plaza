@@ -15,7 +15,7 @@ PostrgeSQL видит только orders_2024
 
 4. Секционирование реплики
 
-![Uploading image.png…]()
+
 
 реплика не знает о секционировании т.к. она отсылается байтами на родительскую таблицу - ей просто незачем это
 
@@ -69,3 +69,4 @@ FROM generate_series(1, 10) g;
 pulling data from shards:
 
 ![Uploading image.png…]()
+
