@@ -29,3 +29,17 @@ cqlsh:hw1> SELECT * FROM orders_by_id WHERE customer_name = 'Ivan';
 InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
 cqlsh:hw1> 
 ```
+
+2. Кладем вторую ноду, и видим, что на первой данные сохранились (я их вернул)
+```sql
+INSERT INTO orders_by_id (order_id, customer_name, amount, city) VALUES (1, 'Ivan', 700, 'Moscow');
+
+docker stop cassandra2
+
+
+USE hw1;
+SELECT * FROM orders_by_id WHERE order_id = 1;
+```
+
+<img width="415" height="125" alt="image" src="https://github.com/user-attachments/assets/a3f600f3-e14e-483d-9119-1bcfe2cae0df" />
+
