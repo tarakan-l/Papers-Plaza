@@ -1,144 +1,87 @@
-<img width="1732" height="700" alt="image" src="https://github.com/user-attachments/assets/b0ab0549-3cf0-4b94-bc07-53e7802e1a71" />
+1. Section
+
+<img width="1026" height="355" alt="image" src="https://github.com/user-attachments/assets/0bda8b24-1939-4470-b7bb-7a7f4d456379" />
+
+PostrgeSQL видит только orders_2024
+
+2. List
+
+<img width="892" height="382" alt="image" src="https://github.com/user-attachments/assets/b50a43c1-0636-4e83-9a00-1b6809647466" />
 
 
-1. Created new role for replication:
+3. Hash
+
+<img width="945" height="362" alt="image" src="https://github.com/user-attachments/assets/a29f7506-3b5d-4015-88c2-648ce4f081f1" />
+
+4. Секционирование реплики
+
+(dude trust me, image didnt upload)
+
+реплика не знает о секционировании т.к. она отсылается байтами на родительскую таблицу - ей просто незачем это
+
+5. Logic replication
+
 ```sql
-CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD 'pass';
+CREATE PUBLICATION pub_parts FOR TABLE orders_range 
+WITH (publish_via_partition_root = false);
+
+CREATE PUBLICATION pub_root FOR TABLE orders_range 
+WITH (publish_via_partition_root = true);
 ```
 
-2. Created two new replics:
-```bash
-  db_master:
-    image: postgres:15
-    container_name: postgres_master
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: dbtest
-    ports:
-      - "5432:5432"
-    command: |
-      postgres 
-      -c wal_level=replica 
-      -c max_wal_senders=10 
-      -c max_replication_slots=10 
-      -c listen_addresses='*'
-    volumes:
-      - ./init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
-  
-  db_replica_1:
-    image: postgres:15
-    container_name: postgres_replica_1
-    depends_on:
-      - db_master
-    ports:
-      - "5433:5432"
-    environment:
-      PGPASSWORD: pass
-    entrypoint: [ "/bin/bash", "-c", "sleep 10 && rm -rf /var/lib/postgresql/data/* && pg_basebackup -h db_master -D /var/lib/postgresql/data -U replicator -P -R && docker-entrypoint.sh postgres" ]
+если с правами = true, то будем просто сразу в таблицу кидать, без секционки, удобно для аналитики чтобы держать большую таблицу вместо мелких секций
 
-  db_replica_2:
-    image: postgres:15
-    container_name: postgres_replica_2
-    depends_on:
-      - db_master
-    ports:
-      - "5434:5432"
-    environment:
-      PGPASSWORD: pass
-    entrypoint: [ "/bin/bash", "-c", "sleep 15 && rm -rf /var/lib/postgresql/data/* && pg_basebackup -h db_master -D /var/lib/postgresql/data -U replicator -P -R && docker-entrypoint.sh postgres" ]
+6. adding shards and router:
 
-```
-
-3. Теперь посмотрел physical streaming replication (выполнив на мастере):
 ```sql
-SELECT application_name, state, sync_state, replay_lag 
-FROM pg_stat_replication;
+CREATE TABLE users_data (id int PRIMARY KEY, name text);
 ```
 
-<img width="617" height="308" alt="image" src="https://github.com/user-attachments/assets/3a1fb3c9-76a3-4d17-8892-ac61a61e51f9" />
-
-4. Вставил данные на мастере:
-
-<img width="835" height="362" alt="image" src="https://github.com/user-attachments/assets/e11b4609-58a7-4d0e-89ed-a6073c501293" />
-
-Проверил их на реплике:
-
-<img width="602" height="373" alt="image" src="https://github.com/user-attachments/assets/4a38e624-7b39-4ec0-99c6-efb44ccbebce" />
-
-5. El stupid попытка вставить на реплике (окончилась провалом):
-
-<img width="681" height="285" alt="image" src="https://github.com/user-attachments/assets/f08045f6-c2c9-4ebf-a160-d6ff0e545e0d" />
-
-6. Вставляем кучу данных
+and router:
 ```sql
-INSERT INTO replication_test (msg) 
-SELECT 'bulk data ' || i FROM generate_series(1, 100000) s(i);
+CREATE EXTENSION postgres_fdw;
+
+CREATE SERVER shard1_server FOREIGN DATA WRAPPER postgres_fdw 
+OPTIONS (host 'db_replica_1', dbname 'dbtest', port '5432');
+
+CREATE SERVER shard2_server FOREIGN DATA WRAPPER postgres_fdw 
+OPTIONS (host 'db_replica_2', dbname 'dbtest', port '5432');
+
+CREATE USER MAPPING FOR postgres SERVER shard1_server OPTIONS (user 'postgres', password '1234');
+CREATE USER MAPPING FOR postgres SERVER shard2_server OPTIONS (user 'postgres', password '1234');
+
+CREATE TABLE users_sharded (id int, name text) PARTITION BY HASH (id);
+
+CREATE FOREIGN TABLE users_shard_0 PARTITION OF users_sharded 
+FOR VALUES WITH (MODULUS 2, REMAINDER 0) SERVER shard1_server OPTIONS (table_name 'users_data');
+
+CREATE FOREIGN TABLE users_shard_1 PARTITION OF users_sharded 
+FOR VALUES WITH (MODULUS 2, REMAINDER 1) SERVER shard2_server OPTIONS (table_name 'users_data');
 ```
 
-Смотрим на задержку (пока идёт вставка)
-
-<img width="634" height="380" alt="image" src="https://github.com/user-attachments/assets/0d0947c5-841b-4c8b-b7c7-af82d8daf503" />
-
----LOGICAL REPLICATION---
-1. Setting up replication level
-```bash
--c wal_level=logical 
-```
-
-2. Creating publication on master
+inserting data:
 ```sql
-CREATE TABLE logical_demo (id int PRIMARY KEY, name text);
-CREATE PUBLICATION my_publication FOR TABLE logical_demo;
+INSERT INTO users_sharded (id, name)
+SELECT g, 'user_' || g
+FROM generate_series(1, 10) g;
 ```
 
-3. Creating a subscription on replicas 
+pulling data from shards:
+
+<img width="663" height="392" alt="image" src="https://github.com/user-attachments/assets/e44f7860-70e2-4c65-a179-6e6a384fb0f3" />
+
+pulling from single shard:
+
+<img width="660" height="294" alt="image" src="https://github.com/user-attachments/assets/a53cdabe-8fdb-4774-85de-4c8945fe24b4" />
+
+checking data on shards:
+
 ```sql
--- 1. Сначала на Реплике создаем такую же структуру
-CREATE TABLE logical_demo (id int PRIMARY KEY, name text);
-
--- 2. Создаем подписку
-CREATE SUBSCRIPTION my_subscription 
-CONNECTION 'host=db_master port=5432 user=postgres password=1234 dbname=dbtest' 
-PUBLICATION my_publication;
+SELECT * FROM users_data;
 ```
 
-4. Data replicated (source - dude trust me)
-```sql
-INSERT INTO logical_test VALUES (777, 'Logical Success!');
-```
-
-and on replica:
-```sql
-SELECT * FROM logical_test;
-```
-
-<img width="297" height="411" alt="image" src="https://github.com/user-attachments/assets/3aa5e97d-7722-4c01-a705-5f9f9edaedf0" />
-
-5. Trying to DDL
-
-on master:
-```sql
-ALTER TABLE logical_test ADD COLUMN meta_data text;
-```
-
-checking on replica:
-<img width="614" height="420" alt="image" src="https://github.com/user-attachments/assets/310f3563-ae2d-497c-87f6-84dc629444e0" />
+<img width="359" height="525" alt="image" src="https://github.com/user-attachments/assets/0ec9fb13-0139-4174-9c15-9c62c36a4d51" />
 
 
-6. Replica Identity 
-Adding new table without primary key on main
-```sql
-CREATE TABLE identity_test (id int, val text);
-ALTER PUBLICATION my_pub ADD TABLE identity_test;
-```
-
-subrscribing on it in replica, then adding some info to it, then trying to update:
-
-<img width="944" height="261" alt="image" src="https://github.com/user-attachments/assets/6a2547f0-9498-4598-80b5-cf401c1b8106" />
-
-7. Replication status
-
-<img width="648" height="463" alt="image" src="https://github.com/user-attachments/assets/99d9ef11-d04d-416f-af0b-5b950bc60f67" />
 
 
