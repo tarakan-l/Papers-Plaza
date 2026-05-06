@@ -106,3 +106,30 @@ client.create_payload_index(COLLECTION_NAME, "views", PayloadSchemaType.INTEGER)
 print("\nPayload indexes created successfully.")
 
 ```
+
+response
+```
+Data inserted successfully.
+
+--- Q1: Simple Search ---
+Global Warming (Score: 0.059)
+Tennis Pro (Score: 0.019)
+Docker Secrets (Score: -0.033)
+
+--- Q2: Tech & High Rating ---
+AI in 2024 (Rating: 4.8)
+Docker Secrets (Rating: 4.1)
+
+--- Q3: Recent & Popular ---
+Global Warming (Views: 1200)
+AI in 2024 (Views: 5000)
+Marathon Basics (Views: 1500)
+
+--- Q4: Complex Filter ---
+AI in 2024 (Cat: tech, Score: 0.104)
+Tennis Pro (Cat: sport, Score: 0.071)
+Docker Secrets (Cat: tech, Score: 0.065)
+Marathon Basics (Cat: sport, Score: 0.028)
+
+Payload indexes created successfully.
+```
