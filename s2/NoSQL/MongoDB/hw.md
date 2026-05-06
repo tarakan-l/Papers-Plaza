@@ -27,7 +27,8 @@ db.books.insertOne({
 db.books.find({ available: true });
 ```
 
-![Uploading image.png…]()
+<img width="525" height="404" alt="image" src="https://github.com/user-attachments/assets/289d8f68-64a0-4b9f-9d63-77e0b34a2e41" />
+
 
 4. Inserting lot o books
 ```MongoDB
@@ -67,7 +68,8 @@ db.books.insertMany([
 ]);
 ```
 
-![Uploading image.png…]()
+<img width="398" height="162" alt="image" src="https://github.com/user-attachments/assets/b26bb3cc-f66c-43a4-8ef3-514796fa088d" />
+
 
 5. Sophisticated find
 
@@ -81,4 +83,6 @@ db.books.find(
   { title: 1, price: 1, _id: 0 }
 );
 ```
-![Uploading image.png…]()
+
+<img width="352" height="239" alt="image" src="https://github.com/user-attachments/assets/99f37270-bfc5-41d8-9345-fa12822d907a" />
+
