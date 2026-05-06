@@ -40,9 +40,5 @@ curl -G "http://localhost:8086/query" \
 ![Uploading image.png…]()
 
 
-Cool ui
-
-![Uploading image.png…]()
-
 
 
