@@ -1,0 +1,59 @@
+﻿services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: itis_queue_db
+    environment:
+      POSTGRES_USER: queue_user
+      POSTGRES_PASSWORD: queue_password
+      POSTGRES_DB: queue_tasks_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U queue_user -d queue_tasks_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: itis_producer
+    environment:
+      - DB_CONNECTION_STRING=Host=postgres_db;Database=queue_tasks_db;Username=queue_user;Password=queue_password
+      - SERVICE_ROLE=Producer
+    depends_on:
+      postgres_db:
+        condition: service_healthy # Ждет полной готовности БД перед запуском
+
+  consumer_1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: itis_consumer_1
+    environment:
+      - DB_CONNECTION_STRING=Host=postgres_db;Database=queue_tasks_db;Username=queue_user;Password=queue_password
+      - SERVICE_ROLE=Consumer
+      - WORKER_ID=Worker_1
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  consumer_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: itis_consumer_2
+    environment:
+      - DB_CONNECTION_STRING=Host=postgres_db;Database=queue_tasks_db;Username=queue_user;Password=queue_password
+      - SERVICE_ROLE=Consumer
+      - WORKER_ID=Worker_2
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
