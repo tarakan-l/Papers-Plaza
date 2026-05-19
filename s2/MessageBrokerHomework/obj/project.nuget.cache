@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "bwPrPQEdmyA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\tarakan\\Documents\\DbProjects\\CustomsControl\\Papers-Plaza\\s2\\MessageBrokerHomework\\QueueApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tarakan\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.0\\microsoft.extensions.dependencyinjection.abstractions.9.0.0.nupkg.sha512",
+    "C:\\Users\\tarakan\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\9.0.0\\microsoft.extensions.logging.abstractions.9.0.0.nupkg.sha512",
+    "C:\\Users\\tarakan\\.nuget\\packages\\npgsql\\10.0.2\\npgsql.10.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
