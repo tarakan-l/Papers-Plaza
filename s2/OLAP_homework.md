@@ -1,145 +1,132 @@
-# OLAP & Data Infrastructure Report
+1. Аналитические вопросы по таможне
 
-## 1. Partitioning by RANGE
+Выбрал 3 простых вопроса для анализа проходов границы:
+- Какая динамика проходов по годам выдачи паспортов?
+- Из каких стран чаще всего везут определенные типы вещей в багаже?
+- Сколько преступников пытаются пройти границу с дипломатическим статусом и без?
 
-```sql
-CREATE TABLE orders_range (id int, dt date, info text) PARTITION BY RANGE (dt);
-CREATE TABLE orders_2023 PARTITION OF orders_range FOR VALUES FROM ('2023-01-01') TO ('2024-01-01');
-CREATE TABLE orders_2024 PARTITION OF orders_range FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
-ALTER TABLE orders_range ADD PRIMARY KEY (id, dt);
+2. Главный факт
 
-EXPLAIN SELECT * FROM orders_range WHERE dt = '2024-05-15' AND id = 10;
-```
+fact_border_crossings (таблица фактов попыток пересечения границы)
 
-### Execution Plan Result:
-```text
-Index Only Scan using orders_range_2024_pkey on orders_range_2024 orders_range (cost=0.15..8.17 rows=1 width=8)
-Index Cond: ((id = 10) AND (dt = '2024-05-15'::date))
-```
-* **Вывод**: Благодаря механизму Partition Pruning, PostgreSQL видит только секцию `orders_2024`. Остальные партиции полностью отсекаются на этапе планирования запроса.
+3. Зерно факта
 
----
+1 строка = 1 попытка въезда гражданина (Entrant) через КПП
 
-## 2. Partitioning by LIST
+4. Создание измерений и таблицы фактов (olap схема)
 
 ```sql
-CREATE TABLE users_list (id int, status text) PARTITION BY LIST (status);
-CREATE TABLE users_active PARTITION OF users_list FOR VALUES IN ('active');
-CREATE TABLE users_deleted PARTITION OF users_list FOR VALUES IN ('deleted');
-ALTER TABLE users_list ADD PRIMARY KEY (id, status);
+CREATE SCHEMA IF NOT EXISTS olap;
 
-EXPLAIN SELECT * FROM users_list WHERE status = 'active';
+CREATE TABLE olap.dim_date (
+    date_key INT PRIMARY KEY,
+    date_actual DATE NOT NULL,
+    day_num INT NOT NULL,
+    month_num INT NOT NULL,
+    month_name VARCHAR(20) NOT NULL,
+    year_num INT NOT NULL
+);
+
+CREATE TABLE olap.dim_entrant (
+    passport_id INT PRIMARY KEY,
+    fullName VARCHAR(100) NOT NULL,
+    countryName VARCHAR(20) NOT NULL,
+    hasBiometry BOOLEAN NOT NULL,
+    hasDiplomatStatus BOOLEAN NOT NULL
+);
+
+CREATE TABLE olap.dim_luggage_summary (
+    luggage_id INT PRIMARY KEY,
+    totalItemsCount INT NOT NULL,
+    mainItemType VARCHAR(255)
+);
+
+CREATE TABLE olap.fact_border_crossings (
+    id SERIAL PRIMARY KEY,
+    passport_date_key INT REFERENCES olap.dim_date(date_key),
+    entrant_id INT REFERENCES olap.dim_entrant(passport_id),
+    luggage_id INT REFERENCES olap.dim_luggage_summary(luggage_id),
+    hasWorkPermission BOOLEAN NOT NULL,
+    hasVaccination BOOLEAN NOT NULL,
+    isWantedCriminal BOOLEAN NOT NULL
+);
 ```
 
-### Execution Plan Result:
-```text
-Bitmap Heap Scan on users_active users_list (cost=13.68..23.15 rows=6 width=36)
-Recheck Cond: (status = 'active'::text)
--> Bitmap Index Scan on users_active_pkey (cost=0.00..13.68 rows=6 width=0)
-   Index Cond: (status = 'active'::text)
-```
-* **Вывод**: Запрос выполняется исключительно внутри изолированной таблицы-партиции `users_active`, сканируя только нужный статус.
-
----
-
-## 3. Partitioning by HASH
+5. Заполнение OLAP-таблиц из OLTP (наш простой ETL)
 
 ```sql
-CREATE TABLE logs_hash (id int, msg text) PARTITION BY HASH (id);
-CREATE TABLE logs_0 PARTITION OF logs_hash FOR VALUES WITH (MODULUS 3, REMAINDER 0);
-CREATE TABLE logs_1 PARTITION OF logs_hash FOR VALUES WITH (MODULUS 3, REMAINDER 1);
-CREATE TABLE logs_2 PARTITION OF logs_hash FOR VALUES WITH (MODULUS 3, REMAINDER 2);
-ALTER TABLE logs_hash ADD PRIMARY KEY (id);
+INSERT INTO olap.dim_date (date_key, date_actual, day_num, month_num, month_name, year_num)
+SELECT 
+    TO_CHAR(datum, 'YYYYMMDD')::INT, datum,
+    EXTRACT(DAY FROM datum), EXTRACT(MONTH FROM datum),
+    TO_CHAR(datum, 'TMMonth'), EXTRACT(YEAR FROM datum)
+FROM generate_series('2020-01-01'::DATE, '2030-12-31'::DATE, '1 day'::INTERVAL) datum;
 
-EXPLAIN SELECT * FROM logs_hash WHERE id = 42;
+INSERT INTO olap.dim_entrant (passport_id, fullName, countryName, hasBiometry, hasDiplomatStatus)
+SELECT 
+    p.id, p.fullName, c.name,
+    (p.biometry IS NOT NULL), (e.diplomatCertificateId IS NOT NULL)
+FROM People.Entrant e
+JOIN identity.passport p ON e.passportId = p.id
+JOIN identity.country c ON p.country = c.id;
+
+INSERT INTO olap.dim_luggage_summary (luggage_id, totalItemsCount, mainItemType)
+SELECT 
+    l.id, COUNT(li.id), MAX(lit.itemName)
+FROM Items.Luggage l
+LEFT JOIN Items.LuggageItem li ON li.luggage_id = l.id
+LEFT JOIN Items.LuggageItemType lit ON li.itemType_Id = lit.id
+GROUP BY l.id;
+
+INSERT INTO olap.fact_border_crossings (passport_date_key, entrant_id, luggage_id, hasWorkPermission, hasVaccination, isWantedCriminal)
+SELECT 
+    TO_CHAR(p.issueDate, 'YYYYMMDD')::INT,
+    e.passportId,
+    e.luggageId,
+    (e.workPermissionId IS NOT NULL),
+    (e.vaccinationCertificateId IS NOT NULL),
+    CASE WHEN cr.crimeId IS NOT NULL THEN TRUE ELSE FALSE END
+FROM People.Entrant e
+JOIN identity.passport p ON e.passportId = p.id
+LEFT JOIN Criminal.Record cr ON p.biometry = cr.biometryId;
 ```
 
-### Execution Plan Result:
-```text
-Index Scan using logs_0_pkey on logs_0 logs_hash (cost=0.15..8.17 rows=1 width=36)
-Index Cond: (id = 42)
-```
-* **Вывод**: Хэш-функция вычислила остаток деления для `id = 42`. План показывает точечное сканирование индекса только внутри целевой секции `logs_0`.
+6. Три аналитических запроса
 
----
-
-## 4. Секционирование реплики
-
-* Физическая реплика (Streaming Replication) не знает и не думает о логическом секционировании, так как она оперирует на уровне низкоуровневых байт данных (WAL-логи) родительской таблицы. Ей просто незачем это знать — структура данных дублируется один в один на диске.
-
----
-
-## 5. Logical Replication & Partitioning Options
-
+Запрос 1: Смотрим сколько людей идет по годам паспортов и сколько из них в розыске
 ```sql
-CREATE PUBLICATION pub_parts FOR TABLE orders_range 
-WITH (publish_via_partition_root = false);
-
-CREATE PUBLICATION pub_root FOR TABLE orders_range 
-WITH (publish_via_partition_root = true);
+SELECT 
+    d.year_num AS passport_year,
+    COUNT(f.id) AS total_entrants,
+    SUM(CASE WHEN f.isWantedCriminal THEN 1 ELSE 0 END) AS criminals_detected
+FROM olap.fact_border_crossings f
+JOIN olap.dim_date d ON f.passport_date_key = d.date_key
+GROUP BY d.year_num
+ORDER BY d.year_num DESC;
 ```
-* **Вывод**: Если параметр `publish_via_partition_root = true`, то изменения дочерних партиций публикуются так, будто они происходят в корневой таблице. Это крайне удобно для DWH/OLAP аналитики, чтобы собирать и держать одну большую плоскую таблицу на стороне приемника вместо поддержки множества мелких секций.
 
----
-
-## 6. Sharding via FDW (Foreign Data Wrappers)
-
-### Infrastructure Configuration (Router setup):
+Запрос 2: Ищем популярные типы вещей в сумках в разрезе стран граждан
 ```sql
-CREATE EXTENSION postgres_fdw;
-
-CREATE SERVER shard1_server FOREIGN DATA WRAPPER postgres_fdw 
-OPTIONS (host 'db_replica_1', dbname 'dbtest', port '5432');
-
-CREATE SERVER shard2_server FOREIGN DATA WRAPPER postgres_fdw 
-OPTIONS (host 'db_replica_2', dbname 'dbtest', port '5432');
-
-CREATE USER MAPPING FOR postgres SERVER shard1_server OPTIONS (user 'postgres', password '1234');
-CREATE USER MAPPING FOR postgres SERVER shard2_server OPTIONS (user 'postgres', password '1234');
-
-CREATE TABLE users_sharded (id int, name text) PARTITION BY HASH (id);
-
-CREATE FOREIGN TABLE users_shard_0 PARTITION OF users_sharded 
-FOR VALUES WITH (MODULUS 2, REMAINDER 0) SERVER shard1_server OPTIONS (table_name 'users_data');
-
-CREATE FOREIGN TABLE users_shard_1 PARTITION OF users_sharded 
-FOR VALUES WITH (MODULUS 2, REMAINDER 1) SERVER shard2_server OPTIONS (table_name 'users_data');
+SELECT 
+    e.countryName,
+    l.mainItemType,
+    COUNT(f.id) AS total_crossings
+FROM olap.fact_border_crossings f
+JOIN olap.dim_entrant e ON f.entrant_id = e.passport_id
+JOIN olap.dim_luggage_summary l ON f.luggage_id = l.luggage_id
+WHERE l.mainItemType IS NOT NULL
+GROUP BY e.countryName, l.mainItemType
+ORDER BY total_crossings DESC;
 ```
 
-### Data Loading:
+Запрос 3: Проверяем процент преступников среди дипломатов и обычных граждан
 ```sql
-INSERT INTO users_sharded (id, name)
-SELECT g, 'user_' || g
-FROM generate_series(1, 10) g;
-```
-
-### Querying all shards (Full Scan):
-```sql
-EXPLAIN (VERBOSE, COSTS OFF) SELECT * FROM users_sharded;
-```
-#### Execution Plan:
-```text
-Append
--> Foreign Scan on public.users_shard_0 users_sharded_1
-   Output: users_sharded_1.id, users_sharded_1.name
-   Remote SQL: SELECT id, name FROM public.users_data
--> Foreign Scan on public.users_shard_1 users_sharded_2
-   Output: users_sharded_2.id, users_sharded_2.name
-   Remote SQL: SELECT id, name FROM public.users_data
-```
-
-### Querying from single shard:
-```sql
-EXPLAIN (VERBOSE, COSTS OFF) SELECT * FROM users_sharded WHERE id = 1;
-```
-#### Execution Plan:
-```text
-Foreign Scan on public.users_shard_0 users_sharded
-Output: users_sharded.id, users_sharded.name
-Remote SQL: SELECT id, name FROM public.users_data WHERE ((id = 1))
-```
-
-### Verification on target shards:
-```sql
-SELECT * FROM users_data;
+SELECT 
+    e.hasDiplomatStatus,
+    COUNT(f.id) AS total_checked,
+    SUM(CASE WHEN f.isWantedCriminal THEN 1 ELSE 0 END) AS wanted_count,
+    ROUND(SUM(CASE WHEN f.isWantedCriminal THEN 1 ELSE 0 END) * 100.0 / COUNT(f.id), 2) AS criminal_percentage
+FROM olap.fact_border_crossings f
+JOIN olap.dim_entrant e ON f.entrant_id = e.passport_id
+GROUP BY e.hasDiplomatStatus;
 ```
