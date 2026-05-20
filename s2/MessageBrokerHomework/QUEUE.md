@@ -1,4 +1,4 @@
-<img width="927" height="834" alt="image" src="https://github.com/user-attachments/assets/d7358ed8-0848-49e9-8fd2-5b8ab56f8d29" />﻿# Отчет по лабораторной работе: Брокер очередей на базе PostgreSQL
+﻿# Отчет по лабораторной работе: Брокер очередей на базе PostgreSQL
 
 ## 1. Проектирование схемы БД (Предметная область: Таможенная служба)
 Для хранения очереди проверок граждан на КПП (в стиле "Papers, Please") создана таблица `tasks`.
@@ -38,6 +38,7 @@ FOR UPDATE SKIP LOCKED
     * Через 15 секунд: **13.15 сек.**
     * Через 30 секунд: **22.79 сек.**
     * Через 50 секунд: **38.86 сек.**
+
  
 <img width="927" height="834" alt="image" src="https://github.com/user-attachments/assets/de305539-ad84-4059-bb9f-06531dd496b0" />
 
